@@ -1,0 +1,83 @@
+.invite-form {
+
+  .label {
+    color: black;
+  }
+
+  .field-container {
+    display: flex;
+    width: 100%;
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+    }
+  }
+
+  .title {
+    text-align: center;
+  }
+
+  .send-link-wrapper {
+
+    width: 50%;
+    border-top: 1px solid #cacaca;
+    padding: 24px;
+    background: #F2F7F7;
+    @media (max-width: 600px) {
+      width: -webkit-fill-available;
+    }
+
+  }
+
+  .expert-link-wrapper {
+    width: 50%;
+    padding: 24px;
+    background: #F2F7F7;
+    border-top: 1px solid #cacaca;
+    border-left: 1px solid #cacaca;
+
+    @media (max-width: 600px) {
+      width: -webkit-fill-available;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+
+    mat-icon {
+      cursor: pointer;
+    }
+
+  }
+
+  .btn__send {
+    background: var(--primary-color);
+    color: var(--app-white);
+  }
+
+  .error {
+    color: red;
+  }
+}
+
+.mat-mdc-dialog-content {
+  padding: 0;
+}
+
+.provider-radio-group {
+  gap: 10px;
+  display: flex;
+  margin-left: 30px;
+}
+
+.success-message {
+  color: green;
+}
+
+.form-error {
+  font-size: 75%;
+  margin-left: 30px;
+}

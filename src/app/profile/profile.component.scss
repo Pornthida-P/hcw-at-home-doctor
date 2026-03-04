@@ -1,0 +1,87 @@
+
+
+dl {
+  line-height: 2em;
+}
+dt {
+  font-size: 14px;
+  color: #3f3f3f;
+  display: block;
+  font-weight: 400;
+}
+dd {
+  margin-inline-start: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  width: 350px;
+
+  mat-form-field {
+    margin-left: 10px;
+  }
+}
+.invite-btn {
+  margin: 20px 80px;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border-radius: 50px;
+  font-size: 12px;
+}
+
+.desc {
+  margin: 20px auto 19px 20px;
+  width: 70%;
+}
+
+.card-left,
+.card-right {
+  padding-top: 31px;
+  padding-bottom: 31px;
+  display: inline;
+
+
+  @media screen and (max-width: 600px) {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+@media screen and (max-width: 1079px) {
+  .cards-container {
+    flex-direction: column !important;
+  }
+}
+
+.provider-radio-group {
+  gap: 10px;
+  display: flex;
+  margin-bottom: 30px;
+}
+
+.cards-container {
+  display: flex;
+  margin-top: 30px;
+  flex-direction: row;
+  .card-left {
+    flex: 3;
+    margin: 30px;
+    background-image: url("/assets/img/bg-queue.png");
+
+
+    @media screen and (max-width: 600px) {
+        margin: 10px;
+    }
+  }
+  .card-right {
+    flex: 2;
+    margin: 40px;
+    background-image: url("/assets/img/bg-open.png");
+    min-width: 186px;
+    @media screen and (max-width: 600px) {
+        margin: 10px;
+    }
+  }
+}
+
+html[data-theme="accessibility"] {
+  font-family: "Source Sans Pro";
+}

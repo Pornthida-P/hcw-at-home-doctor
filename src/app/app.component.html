@@ -1,0 +1,107 @@
+<ng-container *ngIf="isLoggedIn">
+  <mat-drawer-container class="container">
+    <mat-drawer
+      #sidenav
+      mode="side"
+      class="sidenav"
+      [mode]="isMobile ? 'over' : 'side'"
+      [opened]="!isMobile">
+      <div class="main-logo-wrapper">
+        <img
+          class="main-logo"
+          *ngIf="configService.config.logo && !imageError; else defaultLogo"
+          [src]="configService.config.logo"
+          (error)="onImageError()"
+          alt="@" />
+      </div>
+      <ng-template #defaultLogo>
+        <div class="at">
+          &#64; <span>{{ 'login.home' | translate }}</span>
+        </div>
+      </ng-template>
+      <mat-list class="menu-list">
+        <a
+          mat-list-item
+          routerLink="/dashboard"
+          routerLinkActive="active"
+          class="menu-btn">
+          <mat-icon svgIcon="dashboard"></mat-icon>
+          <span class="btn-text">{{ 'app.dashboard' | translate }}</span>
+        </a>
+        <a
+          mat-list-item
+          routerLink="/pending-consultations"
+          tourAnchor="{{TourType.WAITING_ROOM_MENU}}"
+          routerLinkActive="active"
+          class="menu-btn">
+          <mat-icon
+            svgIcon="queue"
+            matBadgePosition="below after"
+            [matBadge]="pendingConsultations || ''"
+            matBadgeColor="warn"></mat-icon>
+          <span class="btn-text">{{ 'app.waitingRoom' | translate }}</span>
+        </a>
+        <a
+          mat-list-item
+          routerLink="/active-consultations"
+          tourAnchor="{{TourType.OPENED_CONSULTATIONS_MENU}}"
+          routerLinkActive="active"
+          class="menu-btn">
+          <mat-icon
+            svgIcon="chat"
+            [matBadgeHidden]="false"
+            matBadgePosition="below after"
+            [matBadge]="activeConsultations || ''"
+            matBadgeColor="warn"></mat-icon>
+          <span class="btn-text">{{
+            'app.openedConsultation' | translate
+          }}</span>
+        </a>
+        <a
+          mat-list-item
+          routerLink="/closed-consultations"
+          tourAnchor="{{TourType.CONSULTATION_HISTORY_MENU}}"
+          routerLinkActive="active"
+          class="menu-btn">
+          <mat-icon svgIcon="history"></mat-icon>
+          <span class="btn-text">{{
+            'app.consultationHistory' | translate
+          }}</span>
+        </a>
+
+        <a
+          mat-list-item
+          routerLink="/invitations"
+          tourAnchor="{{TourType.INVITES_MENU}}"
+          routerLinkActive="active"
+          class="menu-btn">
+          <mat-icon svgIcon="invite"></mat-icon>
+          <span class="btn-text">{{ 'app.invites' | translate }}</span>
+        </a>
+
+        <a
+          mat-list-item
+          routerLink="/test-media"
+          routerLinkActive="active"
+          class="menu-btn">
+          <mat-icon svgIcon="selfcheck"></mat-icon>
+          <span class="btn-text">{{ 'app.testVideoSound' | translate }}</span>
+        </a>
+      </mat-list>
+    </mat-drawer>
+
+    <mat-drawer-content>
+      <div class="content">
+        <div>
+          <router-outlet *ngIf="navigated"></router-outlet>
+        </div>
+        <ng-container *ngIf="markdownExists && showFooter">
+          <app-footer [markdownUrl]="markdownUrl"></app-footer>
+        </ng-container>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</ng-container>
+
+<router-outlet *ngIf="!isLoggedIn"></router-outlet>
+<tour-step-template></tour-step-template>

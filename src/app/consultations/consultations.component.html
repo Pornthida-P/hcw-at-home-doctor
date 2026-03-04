@@ -1,0 +1,305 @@
+<ng-container>
+  <app-overlay
+    (close)="chatOpen = false"
+    *ngIf="chatOpen"
+    [consultation]="currentConsultation"></app-overlay>
+
+  <app-top-nav
+    *ngIf="title"
+    [title]="title.title"
+    [icon]="title.icon"></app-top-nav>
+
+  <div class="consultations-wrapper">
+    <div class="desc">
+      <h2
+        class="d-inline"
+        [matBadge]="
+          status === 'closed' || !consultations.length
+            ? ''
+            : consultations.length
+        "
+        [matBadgeColor]="'warn'"
+        matBadgeOverlap="false">
+        {{ title.title | uppercase }}
+      </h2>
+    </div>
+
+    <div>
+      <div class="filters-wrapper">
+        <button
+          mat-raised-button
+          #filterButton
+          color="primary"
+          (click)="openFilterModal()">
+          <mat-icon svgIcon="filter" class="filter-icon"></mat-icon>
+          {{ 'consultations.filters' | translate }}
+          <app-badge
+            *ngIf="appLiedFiltersCount"
+            [text]="appLiedFiltersCount"></app-badge>
+        </button>
+      </div>
+
+      <table class="consultations">
+        <tr
+          (click)="showChat(consultation._id)"
+          *ngFor="
+            let consultation of consultations;
+            let i = index;
+            trackBy: trackItem
+          ">
+          <td>
+            <span class="tile-header">
+              {{ 'consultations.patient' | translate }}
+            </span>
+
+            <span
+              class="d-flex flex-column"
+              *ngIf="consultation.consultation.firstName !== 'No firstname'">
+              {{
+                consultation.consultation.firstName +
+                  ' ' +
+                  consultation.consultation.lastName
+              }}
+              <app-status
+                *ngIf="status !== 'closed'"
+                [type]="
+                  consultation.consultation.flagPatientOnline
+                    ? 'online'
+                    : 'offline'
+                "></app-status>
+            </span>
+
+            <ng-container
+              *ngIf="consultation.consultation.firstName === 'No firstname'">
+              <span style="color: #8a8a8a" class="d-flex flex-column">
+                {{ 'consultations.noPatientName' | translate }}
+              </span>
+            </ng-container>
+          </td>
+          <td class="hidden-mobile">
+            <span class="tile-header">
+              {{ 'consultations.requestedBy' | translate }}
+            </span>
+            <span
+              *ngIf="
+                consultation?.nurse?.firstName || consultation?.nurse?.lastName;
+                else emptyBlock
+              ">
+              {{ consultation?.nurse?.firstName }}
+              {{ consultation?.nurse?.lastName }}
+            </span>
+            <ng-template #emptyBlock>
+              <span>-</span>
+            </ng-template>
+          </td>
+          <td class="hidden-mobile">
+            <span class="tile-header">
+              {{ 'consultations.waitingQueue' | translate }}
+            </span>
+            {{
+              consultation.queue && consultation.queue.name
+                ? consultation.queue.name
+                : '-'
+            }}
+          </td>
+          <td *ngIf="status !== 'pending'" class="hidden-mobile">
+            <span class="tile-header">
+              {{ 'consultations.handledBy' | translate }}
+            </span>
+            @if (consultation.acceptedByUser) {
+              {{ consultation.acceptedByUser.firstName }}
+              {{ consultation.acceptedByUser.lastName }}
+            } @else {
+              -
+            }
+          </td>
+          <td *ngIf="status !== 'closed'" class="hidden-mobile">
+            <span class="tile-header">
+              {{ 'consultations.message' | translate }}
+            </span>
+            {{
+              (consultation.lastMsg
+                ? consultation.lastMsg.text ||
+                  ('consultations.attachement' | translate)
+                : ('consultations.newConsultation' | translate)
+              ) | slice: 0 : 25
+            }}
+          </td>
+          <td *ngIf="status === 'closed'">
+            <span class="tile-header">
+              {{ 'consultations.startDateTime' | translate }}
+            </span>
+            {{
+              consultation.consultation.createdAt
+                | date: 'd MMM yyyy HH:mm' : 'fr'
+            }}
+          </td>
+          <td *ngIf="status !== 'closed'">
+            <span class="tile-header">
+              {{ 'consultations.time' | translate }}
+            </span>
+            {{
+              (consultation.lastMsg
+                ? consultation.lastMsg.createdAt
+                : consultation.consultation.createdAt
+              ) | msgTime
+            }}
+          </td>
+          <td *ngIf="status === 'closed'" class="hidden-mobile">
+            <span class="tile-header">
+              {{ 'consultations.duration' | translate }}
+            </span>
+            {{
+              consultation.consultation.createdAt -
+                consultation.consultation.closedAt | duration
+            }}
+          </td>
+          <td *ngIf="status === 'closed'" class="hidden-mobile">
+            <span class="tile-header">
+              {{ 'consultations.closedBy' | translate }}
+            </span>
+            @if (consultation.closedByUser) {
+              {{ consultation.closedByUser.firstName }}
+              {{ consultation.closedByUser.lastName }}
+            } @else {
+              -
+            }
+          </td>
+          <ng-container *ngIf="configService.config?.metadata?.length">
+            <td
+              *ngFor="let displayItem of configService.config.metadata"
+              class="hidden-mobile">
+              <ng-container *ngIf="status !== 'closed'">
+                <span class="tile-header">
+                  {{
+                    ('metadata.' + displayItem | translate) !==
+                    'metadata.' + displayItem
+                      ? ('metadata.' + displayItem | translate)
+                      : displayItem
+                  }}
+                </span>
+                <ng-container
+                  *ngIf="
+                    consultation.consultation.metadata === null ||
+                      Object.keys(consultation.consultation.metadata).length ===
+                        0;
+                    else metanull
+                  ">
+                  -
+                </ng-container>
+                <ng-template #metanull>
+                  {{
+                    consultation.consultation.metadata[displayItem]
+                      ? consultation.consultation.metadata[displayItem]
+                      : '-'
+                  }}
+                </ng-template>
+              </ng-container>
+            </td>
+          </ng-container>
+
+          @if (status !== 'closed') {
+            <td class="online-status-cell hidden-mobile">
+              <span class="tile-header">
+                {{ 'consultations.participant' | translate }}
+              </span>
+              @if (consultation.guest) {
+                @if (consultation.guest.email) {
+                  <span [matTooltip]="'consultations.guestTooltip' | translate">
+                    {{ consultation.guest.email }}
+                  </span>
+                } @else if (consultation.guest.phoneNumber) {
+                  <span [matTooltip]="'consultations.guestTooltip' | translate">
+                    {{ consultation.guest.email }}
+                  </span>
+                } @else {
+                  -
+                }
+                <app-status
+                  [matTooltip]="'consultations.guestTooltip' | translate"
+                  [type]="
+                    consultation.consultation.flagGuestOnline
+                      ? 'online'
+                      : 'offline'
+                  "></app-status>
+              } @else {
+                @if (consultation.guestInvite) {
+                  @if (consultation.guestInvite.emailAddress) {
+                    <span
+                      [matTooltip]="'consultations.guestTooltip' | translate">
+                      {{ consultation.guestInvite.emailAddress }}
+                    </span>
+                  }
+                  @if (consultation.guestInvite.phoneNumber) {
+                    <span
+                      [matTooltip]="'consultations.guestTooltip' | translate">
+                      {{ consultation.guestInvite.phoneNumber }}
+                    </span>
+                  }
+                } @else {
+                  <span>-</span>
+                }
+              }
+            </td>
+          }
+          <td>
+            @if (!consultation?.nurse?.firstName) {
+              <button
+                (click)="openDialog($event, consultation)"
+                mat-stroked-button
+                color="primary"
+                *ngIf="status === 'closed'">
+                {{ 'consultations.sendAgainANewInvitation' | translate }}
+              </button>
+              <button
+                (click)="resendInvite($event, consultation.consultation.invite)"
+                mat-stroked-button
+                color="primary"
+                *ngIf="status !== 'closed'">
+                {{ 'consultations.sendAgainTheInvitation' | translate }}
+              </button>
+            }
+          </td>
+
+          <td>
+            <button
+              mat-flat-button
+              color="primary"
+              (click)="exportPDF($event, consultation)">
+              <mat-icon
+                aria-hidden="false"
+                fontIcon="file_download"></mat-icon>
+              {{ 'consultations.exportButton' | translate }}
+            </button>
+          </td>
+
+          <td *ngIf="status !== 'closed'" class="hidden-mobile">
+            <span class="tile-header" *ngIf="consultation.unreadCount">
+              {{ 'consultations.unread' | translate }}
+            </span>
+            <mat-icon
+              *ngIf="consultation.unreadCount"
+              [matBadge]="consultation.unreadCount"
+              matBadgeColor="warn"></mat-icon>
+          </td>
+          <td class="chevron-right">
+            <mat-icon fontIcon="chevron_right"></mat-icon>
+          </td>
+        </tr>
+
+        <tr class="empty-row" *ngIf="!consultations.length">
+          <td rowspan="8">
+            <h4>
+              {{ 'consultations.noConsultation' | translate }}
+            </h4>
+          </td>
+        </tr>
+      </table>
+
+      <app-custom-pagination
+        [totalItems]="consultations.length"
+        [itemsPerPage]="10"
+        (pageChange)="page = $event"></app-custom-pagination>
+    </div>
+  </div>
+</ng-container>

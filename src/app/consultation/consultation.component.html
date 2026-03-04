@@ -1,0 +1,193 @@
+<app-top-nav
+  *ngIf="consultation"
+  [consultation]="consultation"
+  [showCloseConsBtn]="true"
+  (closeCon)="confirmClose = true"></app-top-nav>
+<app-overlay
+  (close)="confirmClose = false"
+  *ngIf="confirmClose"
+  [showFinishOption]="true"
+  [redirect]="redirect"
+  [showCloseOverlay]="true"
+  [consultation]="consultation"></app-overlay>
+
+<app-scheduled-for-card
+  *ngIf="consultation?.consultation?.scheduledFor && !scheduledCardClosed"
+  [scheduledTime]="getFormattedScheduledTime()"
+  [timezone]="consultation?.consultation?.patientTZ"
+  (close)="closeScheduledCard()"></app-scheduled-for-card>
+
+<div class="con-wrap">
+  <div
+    *ngIf="incomingCall"
+    class="call-wrap"
+    [ngClass]="{ mobileFullHeight: mobileFullHeight }"
+    [style.flex]="incomingCall ? '2' : '1'">
+    <app-video-room
+      (resizeLayout)="resizeLayout()"
+      (hangup)="reject()"
+      [sessionId]="consultation._id"
+      [token]="currentCall?.token"
+      [audioOnly]="audioOnly"
+      [audioDeviceId]="audioDeviceId"
+      [videoDeviceId]="videoDeviceId"></app-video-room>
+  </div>
+  <div
+    *ngIf="!incomingCall"
+    [ngClass]="{ mobileFullHeight: mobileFullHeight }"
+    class="bounds call-wrap">
+    <div class="fixed-height"></div>
+
+    <mat-icon svgIcon="phone" class="phone-icon"></mat-icon>
+    <h3 class="title">
+      {{ 'consultation.start' | translate }}
+      <br />
+      <strong>{{ 'consultation.aCall' | translate }}</strong>
+    </h3>
+
+    <div class="buttons">
+      <div class="actions-button-wrapper">
+        <button
+          (click)="makeCall(false)"
+          mat-raised-button
+          color="primary"
+          [disabled]="callingInProgress"
+          *ngIf="
+            videoDevices.length > 0 &&
+            currentCall &&
+            currentCall.type === 'videoCall' &&
+            !otherDoctorInCall
+          ">
+          <mat-icon svgIcon="camera"></mat-icon>
+          &nbsp;&nbsp;
+          {{ 'consultation.joinVideoCall' | translate }}
+        </button>
+
+        <button
+          (click)="initiateVideoCall()"
+          mat-raised-button
+          color="primary"
+          [disabled]="callingInProgress"
+          *ngIf="!currentCall && !otherDoctorInCall">
+          <mat-icon svgIcon="camera"></mat-icon>
+          &nbsp;&nbsp;
+          {{ 'consultation.videoCall' | translate }}
+        </button>
+
+        <button
+          (click)="makeCall(true)"
+          mat-raised-button
+          color="primary"
+          [disabled]="callingInProgress"
+          *ngIf="!currentCall && !otherDoctorInCall">
+          <mat-icon svgIcon="mic"></mat-icon>
+          &nbsp;&nbsp;
+          {{ 'consultation.audioCall' | translate }}
+        </button>
+
+        <div *ngIf="otherDoctorInCall" class="other-doctor-in-call">
+          <mat-icon>phone_in_talk</mat-icon>
+          <span>{{ 'consultation.anotherDoctorInCall' | translate }}</span>
+        </div>
+
+        <button
+          (click)="makeCall(true)"
+          mat-raised-button
+          color="primary"
+          [disabled]="callingInProgress"
+          *ngIf="
+            currentCall &&
+            currentCall.type === 'audioCall' &&
+            !otherDoctorInCall
+          ">
+          <mat-icon svgIcon="mic"></mat-icon>
+          &nbsp;&nbsp;
+          {{ 'consultation.joinAudioCall' | translate }}
+        </button>
+
+        <button (click)="openConfiguration()" mat-raised-button color="primary">
+          <mat-icon svgIcon="info"></mat-icon>
+          &nbsp;&nbsp;
+          {{ 'consultation.configuration' | translate }}
+        </button>
+
+        @if (!consultation?.nurse?.firstName) {
+          <button
+            (click)="openRescheduleDialog()"
+            mat-raised-button
+            color="primary">
+            <mat-icon>schedule</mat-icon>
+            &nbsp;&nbsp;
+            {{ 'consultation.reschedule' | translate }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-wrap" [style.flex]="incomingCall ? '1' : '2'">
+    <app-chat
+      *ngIf="consultation"
+      [showInput]="consultation.consultation.status === 'active'"
+      [consultation]="consultation"
+      [publicinvite]="publicinvite"></app-chat>
+  </div>
+
+  <div id="configuration" *ngIf="showConfiguration">
+    <div class="container">
+      <h1 mat-dialog-title>
+        {{ 'consultation.microAndCameraConfiguration' | translate }}
+      </h1>
+
+      <div mat-dialog-content>
+        <div class="left">
+          <p>{{ 'consultation.microSelection' | translate }}</p>
+
+          <mat-form-field
+            class="device--select"
+            *ngIf="audioDevices.length > 0">
+            <mat-select
+              [required]="audioDevices.length > 1"
+              [(ngModel)]="audioDeviceId"
+              [disabled]="audioDevices.length < 2">
+              <mat-option
+                *ngFor="let device of audioDevices; let i = index"
+                [value]="device.deviceId">
+                {{ device.label || 'device ' + (i + 1) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div id="volume-container">
+            <div id="volume-slider" [style.width.%]="100 - volumeLevel"></div>
+          </div>
+        </div>
+
+        <div class="right">
+          <p>{{ 'consultation.cameraSelection' | translate }}</p>
+
+          <mat-form-field
+            class="device--select"
+            *ngIf="videoDevices.length > 0">
+            <mat-select
+              [required]="videoDevices.length > 1"
+              [(ngModel)]="videoDeviceId"
+              [disabled]="videoDevices.length < 2">
+              <mat-option
+                *ngFor="let device of videoDevices; let i = index"
+                [value]="device.deviceId">
+                {{ device.label || 'device ' + (i + 1) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div mat-dialog-actions>
+        <button mat-flat-button color="primary" (click)="closeConfiguration()">
+          {{ 'consultation.close' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

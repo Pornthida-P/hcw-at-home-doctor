@@ -1,0 +1,267 @@
+
+.phone-num {
+  display: flex;
+}
+
+.country-code {
+  display: flex;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.phone-num-field {
+  padding-top: 4px;
+}
+
+.label {
+  color: black !important;
+}
+
+.field-container {
+  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 4px 10px;
+  place-items: center;
+  justify-content: space-around;
+
+  mat-form-field,
+  mat-checkbox {
+    //margin: 16px 30px;
+    flex: 1;
+
+    @media (max-width: 600px) {
+      margin: 0;
+    }
+
+  }
+
+  .experts-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .expert-field {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+
+
+}
+
+.invite-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 30px;
+
+  h1 {
+    margin-bottom: 0px;
+    text-align: center;
+  }
+
+}
+
+.dialog-title {
+  display: block !important;
+}
+
+.error {
+  margin-top: 28px;
+  color: rgb(255, 45, 45);
+  text-align: center;
+}
+
+.dialog-content {
+  height: 100%;
+  padding-top: 20px !important;
+}
+
+.btn__send {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.btn_submit {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.btn__cancel {
+  background-color: rgb(255, 45, 45);
+  color: #ffffff;
+}
+
+.mat-form-field-disabled .label {
+  color: #bbb !important;
+}
+
+.schedule {
+}
+
+.form-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex: 1;
+}
+
+.form-container > div {
+  margin: 16px;
+}
+
+.interpreter__form {
+  margin: 0 !important;
+  flex: 1 1 234px !important;
+  height: auto;
+  display: flex;
+  align-items: stretch;
+  background-color: #f2f7f7;
+
+  &:last-child {
+    border-left: 1px solid rgb(182, 182, 182);
+  }
+}
+
+.patient__form {
+  flex: 2 1 362px !important;
+
+  margin: 0 !important;
+}
+
+.submit__section {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin: 0px !important;
+  border-top: 1px solid rgb(182, 182, 182);
+  align-items: center;
+  min-height: 60px;
+  margin-top: 0 !important;
+  padding: 10px !important;
+}
+
+p {
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 99%;
+}
+
+h1 {
+  font-size: 2em;
+  font-weight: 100;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgb(182, 182, 182);
+}
+
+.language__option {
+  display: flex;
+  justify-content: space-between;
+  margin: 2px 10px;
+}
+
+.invite-type-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.invite-type-header {
+  padding: 23px;
+  border-bottom: 1px solid #b6b6b6;
+
+  h1 {
+    text-align: center;
+    margin-bottom: 0;
+    border-bottom: none;
+    padding: 10px;
+  }
+}
+
+.invite-type-content {
+  display: flex;
+  flex: 1;
+  text-align: center;
+
+  & > div {
+    justify-content: space-around !important;
+    align-items: center !important;
+    max-width: 300px;
+  }
+
+  h4 {
+    margin: 4px auto;
+    font-weight: 500;
+  }
+
+  p {
+    font-weight: 200;
+  }
+}
+
+.on-premise-container {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+}
+
+.accepted-invite-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.field-container-inner {
+  gap: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.might-late-warning {
+  margin-top: 10px;
+  margin-left: 30px;
+}
+
+.provider-radio-group {
+  gap: 10px;
+  display: flex;
+  margin-left: 30px;
+}
+
+.radio-group-error {
+  display: flex;
+  font-size: 75%;
+  margin-top: 10px;
+  justify-content: center;
+
+}
+
+.success-message {
+  color: green;
+}
+
+.form-error {
+  font-size: 75%;
+  margin-left: 30px;
+}
+

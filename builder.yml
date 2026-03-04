@@ -1,0 +1,12 @@
+flows:
+- podman
+- deb
+- publish-github
+- sonar
+options:
+ distrib: "ubuntu"
+ codename: "focal"
+ external_git_url: "git@github.com:HCW-home/frontend-doctor.git"
+modes:
+- ON_VERSION
+- ON_TAG

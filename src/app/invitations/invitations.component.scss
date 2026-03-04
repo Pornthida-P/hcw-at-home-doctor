@@ -1,0 +1,130 @@
+
+mat-grid-list {
+  background-color: #ffffff;
+}
+
+span.tile-header {
+  font-size: 11px;
+  color: #3f3f3f;
+}
+
+.status-wrapper {
+  padding: 5px;
+  width: fit-content;
+  border-radius: 3px;
+}
+
+.edit-button {
+  margin-top: 10px;
+  @media screen and (max-width: 600px) {
+    padding: 0;
+  }
+}
+
+.send-again {
+  @media screen and (max-width: 600px) {
+    padding: 0;
+  }
+}
+
+.pdf-table {
+  margin: auto;
+  font-size: 40px;
+  width: 60%;
+
+  tr {
+    border-bottom: 1px solid#b1b1b191;
+
+    height: 143px;
+  }
+
+  th,
+  td {
+    margin: 10px auto;
+    border-bottom: 1px solid#b1b1b191;
+    padding: 16px;
+
+  }
+
+  tr:first-child > th,
+  tr:first-child > td {
+    border-top: 1px solid#b1b1b191;
+  }
+
+  th {
+    margin-right: 20px;
+    width: 503px;
+    border-left: 1px solid#b1b1b191;
+    border-right: 1px solid#b1b1b191;
+  }
+
+  td {
+    border-right: 1px solid#b1b1b191;
+  }
+}
+
+.invite-btn {
+  margin: 20px 0;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border-radius: 50px;
+  font-size: 12px;
+}
+
+.loading-wrapper {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.invitations-wrapper {
+  margin: 60px 30px 30px 30px;
+
+  @media screen and (max-width: 600px) {
+    margin: 30px 10px;
+  }
+}
+
+.invitations {
+  width: 100%;
+  font-size: 13px;
+  font-weight: 500;
+  border-collapse: collapse;
+  background: var(--app-white);
+  box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+
+  tr {
+    border-top: 1px solid #b1b1b191;
+    border-left: 2px solid #fff;
+    &:hover {
+      border-left: 2px solid var(--primary-color);
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .hidden-mobile {
+      display: none;
+    }
+  }
+  td {
+    padding: 18px 10px;
+    vertical-align: text-top;
+  }
+  .tile-header {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 400;
+  }
+}
+
+.btn__cancel {
+
+  background-color: var(--app-red);
+  color: var(--app-white);
+
+  @media screen and (max-width: 600px) {
+    padding: 0;
+  }
+}

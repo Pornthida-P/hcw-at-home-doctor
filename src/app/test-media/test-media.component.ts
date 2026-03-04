@@ -1,0 +1,132 @@
+import { RoomService, LogService } from 'hcw-stream-lib';
+import { AuthService } from './../auth/auth.service';
+import { OpenViduService } from './../openvidu.service';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  OnDestroy,
+} from '@angular/core';
+import { Subscription } from 'rxjs';
+import { ErrorDialogComponent } from '../error-dialog/error-dialog.component';
+import { TranslateService } from '@ngx-translate/core';
+import { MatDialog } from '@angular/material/dialog';
+
+@Component({
+  selector: 'app-test-media',
+  templateUrl: './test-media.component.html',
+  styleUrls: ['./test-media.component.scss'],
+})
+export class TestMediaComponent implements OnInit, OnDestroy {
+  title: {
+    title: 'Test son & vidéo';
+    icon: 'chat';
+  };
+
+  videoDeviceId: string;
+  audioDeviceId: string;
+  videoDevices = [];
+  audioDevices = [];
+  myCamStream;
+  volumeLevel = 0;
+  showSpinner;
+  error;
+  peerId: string;
+  private destroyed = false;
+  private subscriptions: Subscription[] = [];
+  @ViewChild('videoElement') videoElement: ElementRef;
+
+  constructor(
+    private openviduSev: OpenViduService,
+    private authService: AuthService,
+    private logger: LogService,
+    private roomService: RoomService,
+    public dialog: MatDialog,
+    private translate: TranslateService
+  ) {}
+
+  ngOnInit() {
+    this.peerId = this.authService.currentUserValue.id;
+    this.showSpinner = true;
+    this.initMediaTests();
+  }
+
+  ngOnDestroy() {
+    this.destroyed = true;
+    this.subscriptions.forEach(sub => sub?.unsubscribe());
+    this.roomService?.close();
+  }
+
+  initMediaTests() {
+    if (this.destroyed) return;
+
+    this.subscriptions.push(
+      this.roomService.onVolumeChange.subscribe(change => {
+        this.volumeLevel = change.volume * 1000;
+      })
+    );
+
+    this.openviduSev.getTestToken().then(
+      ({ token }) => {
+        if (this.destroyed) return;
+
+        this.roomService.init({ peerId: this.peerId });
+
+        this.roomService.join({
+          roomId: this.peerId,
+          joinVideo: true,
+          joinAudio: true,
+          token,
+        });
+
+        this.subscriptions.push(
+          this.roomService.onCamProducing.subscribe(stream => {
+            this.logger.debug('Cam producing ', stream);
+            this.myCamStream = stream;
+            this.showSpinner = false;
+
+            this.openviduSev.getDevices().then(devices => {
+              if (this.destroyed) return;
+              this.videoDevices = devices.filter(
+                device => device.kind === 'videoinput'
+              );
+              if (this.videoDevices.length && this.videoDevices[0].deviceId !== '') {
+                this.videoDeviceId = this.videoDevices[0].deviceId;
+              }
+              this.audioDevices = devices.filter(
+                device => device.kind === 'audioinput'
+              );
+              if (this.audioDevices.length && this.audioDevices[0].deviceId !== '') {
+                this.audioDeviceId = this.audioDevices[0].deviceId;
+              }
+            });
+          })
+        );
+      },
+      err => {
+        const message =
+          err.error?.details ||
+          err.details ||
+          err.error?.message ||
+          err.statusText ||
+          err.message ||
+          err;
+        const errorMessage = `${this.translate.instant('testMedia.testError')} ${message}`;
+        this.showErrorDialog(errorMessage, '');
+        this.showSpinner = false;
+      }
+    );
+  }
+
+  showErrorDialog(message: string, title: string): void {
+    this.dialog.open(ErrorDialogComponent, {
+      width: '450px',
+      autoFocus: false,
+      data: {
+        title,
+        message,
+      },
+    });
+  }
+}

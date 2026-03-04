@@ -1,0 +1,25 @@
+.label {
+  color: var(--app-black);
+}
+
+.input-wrapper {
+  gap: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.expert-link-wrapper {
+  max-width: 432px;
+
+  .input-wrapper {
+    gap: 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  mat-icon {
+    cursor: pointer;
+  }
+
+}
+

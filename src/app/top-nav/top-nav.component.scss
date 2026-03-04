@@ -1,0 +1,138 @@
+.header {
+  top: 0;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 70px;
+  z-index: 100;
+  display: flex;
+  position: sticky;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--app-white);
+  border-bottom: 1px solid rgb(209, 209, 209);
+}
+
+.header-items {
+  gap: 8px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.terminate-consultation {
+  display: flex;
+  cursor: pointer;
+  margin-left: 12px;
+  text-align: center;
+  align-items: center;
+  vertical-align: middle;
+  justify-content: center;
+
+  @media (max-width: 600px) {
+    font-size: 12px;
+  }
+}
+
+#user {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  position: relative;
+  align-items: center;
+
+  @media (max-width: 600px) {
+    font-size: 12px;
+  }
+
+  mat-icon {
+    text-align: left;
+    padding-right: 15px;
+    vertical-align: middle;
+    display: inline-flex;
+    height: 28px;
+    padding-bottom: 4px;
+    width: 28px;
+    font-size: 28px;
+  }
+
+  .items {
+    right: -5px;
+    top: 51px;
+    min-width: 220px;
+    position: absolute;
+
+    div {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      padding-left: 15px;
+      justify-content: flex-start;
+      background: var(--app-white);
+      border: 1px solid #e4e4e4;
+    }
+
+    .logout {
+      color: var(--app-white);
+      background: var(--app-red);
+    }
+  }
+}
+
+.help-button {
+  @media (max-width: 600px) {
+    padding: 0;
+    border: none;
+
+    .mat-mdc-outlined-button:hover .mat-mdc-button-persistent-ripple::before {
+      opacity: 0;
+    }
+
+    .help-icon {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      font-size: 28px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .help-button-text {
+      display: none;
+    }
+  }
+}
+
+.new-consultation {
+  gap: 4px;
+  display: flex;
+  cursor: pointer;
+  color: #000000de;
+  text-align: right;
+  align-items: center;
+  background: transparent;
+
+  @media (max-width: 600px) {
+    font-size: 12px;
+  }
+}
+
+.menu {
+  height: 100%;
+  display: flex;
+  cursor: pointer;
+  margin-left: 20px;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 24px;
+  }
+}
+
+.user-wrapper {
+  cursor: pointer;
+  margin-right: 10px;
+}

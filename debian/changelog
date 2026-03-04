@@ -1,0 +1,1229 @@
+hcw-athome-caregiver (0.5.70) UNRELEASED; urgency=medium
+
+  * improve video room
+  * update colors
+
+ -- Gor Grigoryan <gorgrigoryan1997@gmail.com>  Fri, 27 Feb 2026 08:27:04 +0000
+
+hcw-athome-caregiver (0.5.68) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Move back to bookworm
+  * Update es lang
+  * Fix missing translation and translate metadata
+
+  [ Gor Grigoryan ]
+  * skip some routes for error interceptor
+  * add template type when checking prefix
+  * fix expert invitation
+  * change expert invitation
+  * handle invite not found
+  * update send expert link endpoint body and error interceptor
+  * add doctor information in consultation report
+  * show error dialog when getting blocked error only
+  * improve error handler
+
+  [ Olivier Bitsch ]
+  * Added translation using Weblate (Spanish)
+
+  [ Gor Grigoryan ]
+  * improve error interceptor
+
+  [ Eugene Paik ]
+  * Translated using Weblate (Spanish)
+
+  [ Gor Grigoryan ]
+  * refs #8414, show request and information when error is occurred
+
+  [ Eugene Paik ]
+  * Translated using Weblate (Spanish)
+  * Translated using Weblate (Spanish)
+
+  [ Gor Grigoryan ]
+  * feat: Add Spanish 🇪🇸language support
+
+  [ Eugene Paik ]
+  * Added translation using Weblate (Kazakh)
+
+  [ Gor Grigoryan ]
+  * translate role in pdf
+
+  [ Eugene Paik ]
+  * Translated using Weblate (Kazakh)
+  * Translated using Weblate (Kazakh)
+
+  [ Gor Grigoryan ]
+  * add Kazakh (kk) language support
+  * fix saving notification settings
+
+  [ Eugene Paik ]
+  * Translated using Weblate (French)
+
+  [ Gor Grigoryan ]
+  * read chat messages when open consultation room
+  * update jspdf and remove wait-on devDependencies
+  * fix tour finishing issue
+  * add skipping planning consultation and navigation after login
+  * update socket.io-client
+  * update node version to 20
+
+  [ Olivier Bitsch ]
+  * Switch to Alpine
+  * Add missing make command$
+  * Trigger release
+
+  [ Gor Grigoryan ]
+  * refs #8707, Managed by queue, #8725 Have preferred language for doctor
+  * refs #8722, Skip parameter for time estimation
+  * fix navigation when other doctors are calling to shared queue
+  * add filter for handled by
+  * Check if the caller is trying to call themselves
+  * add sound when receiving new message
+  * linkify messages in chat
+  * add not found page, change video call button apearing functionality, change link color in messages
+  * add forbidden page, update dialog for planning consultation
+  * add a way to reschedule consultation
+  * hide reschedule when it has requested by
+  * improve router guard
+  * fix navigation after creating invite from dashboard
+  * fix dashboard navigation when receiving new message
+  * improve pdf generation
+  * add expert role translation
+  * add guest role in translations
+  * update expert invite flow
+  * update hcw-stream-lib to 0.0.21
+  * add web view detection for whatsapp
+  * test user agent in whatsapp browser
+  * add web view patterns
+  * update web view warning modal
+  * remove userAgent debug content
+  * add switch user in top nav menu
+  * fix profile dropdown width
+  * add get link button in invites list
+  * fix doctor private note modal closing issue
+  * add video call connection error handling and status feedback
+  * add export pdf button
+  * Replace x-access-token header with standard Authorization: Bearer
+
+<<<<<<< HEAD
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 25 Feb 2026 07:46:33 +0100
+
+hcw-athome-caregiver (0.5.34) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Update changelog for 0.5.20 release
+
+  [ Gor Grigoryan ]
+  * add acknowledged status
+  * refs #7983, add new scheduled for invite status
+  * refs  #7983, add new statuses of invites
+  * refs #7986, Translation Ukrainian missing
+  * refs #7990, change view of invite table
+  * improve invitations table
+  * add config for tour translations, guest invite fixes
+  * refs #7992, add new column called 'communication method' in invitations list
+  * refs #7982, have guests and experts column even when they didn't join
+
+  [ Weblate ]
+  * Update translation files
+
+  [ Gor Grigoryan ]
+  * update error message
+  * add am to languages
+  * refs #7995, invite form issue
+  * update language selector
+  * remove cancel tooltip
+  * refs #7985, new design for auth pages
+  * update locale translations
+
+  [ Weblate ]
+  * Update translation files
+
+  [ Gor Grigoryan ]
+  * refs #7995,fix invite button when guest email has error
+  * fix login button after success reset
+  * fix pdf report when long text in messages
+  * refs #8221, New setting ENABLED_FIELDS_FORM_DOCTOR
+  * update 3rd Party Packages
+  * remove deprecated protractor
+  * add moment-timezone to allowedCommonJsDependencies
+  * improve pdf download when there is logo url
+  * fix permission for Microphone issue when calling to patient
+  * improve svg logos in pdf report
+  * Fix metadata check to handle both null and empty object cases
+  * add ability to edit consultation note
+  * refs #8318, Chat new line with SHIFT key
+  * refs #8321, Add close button to close overlay in history overlay
+  * improve headers color in exported pdf
+  * improve pdf view when requester information exists
+  * add translations for pdf
+  * add global error handling
+  * improve chat loading
+  * hide global error handler when verifying refresh token
+
+  [ Olivier Bitsch ]
+  * Use static alpine image
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 03 Jun 2025 12:01:52 +0200
+
+hcw-athome-caregiver (0.5.20) focal; urgency=medium
+
+  * Adding self signed certificate on nginx
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 16 Jan 2025 15:48:37 +0100
+
+hcw-athome-caregiver (0.5.19) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * add variables for new translations
+  * update translation files,remove support page
+  * fix control buttons when calling
+  * add uk json
+
+  [ Weblate ]
+  * Update translation files
+
+  [ Gor Grigoryan ]
+  * fix tour backdrop
+  * add ukranian support
+  * fix verification page ui
+
+  [ Olivier Bitsch ]
+  * New dev release for docker
+
+  [ Gor Grigoryan ]
+  *  add support for 'onclick' in footer markdown
+  * refs #7972, Replace branding in title page
+  * translat invitations page title
+  * fix translation
+  * check prefix when phone number exists
+  * handle different statuses for invite
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 16 Jan 2025 14:21:09 +0100
+
+hcw-athome-caregiver (0.5.8) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Fix Dockerfile
+
+  [ Gor Grigoryan ]
+  * refs #7645, Add a way for the doctor to get his notification over whatsapp
+  * plan consultation screen fixes
+  * refs #7881, Closing consultation modal is buggy
+  * refs #7879, Add refresh button of websocket disconnects
+  * change chat file download button
+  * check if prefix is supported for notification
+  * add file name when exporting consultation report
+  * add uk language in invite form
+  * refs #7474, In app training - UX improvement for doctor app
+
+  [ Olivier Bitsch ]
+  * Provide guided tour english text
+  * Add missing text for datetime in english
+  * Translated using Weblate (French)
+
+  [ Gor Grigoryan ]
+  * remove unused translations in en
+
+  [ Olivier Bitsch ]
+  * Translated using Weblate (French)
+
+  [ Weblate ]
+  * Update translation files
+
+  [ Olivier Bitsch ]
+  * Translated using Weblate (French)
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 18 Dec 2024 09:33:51 +0100
+
+hcw-athome-caregiver (0.5.3) focal; urgency=medium
+
+  * Add VERSION in Dockerfile
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Sat, 16 Nov 2024 13:50:30 +0100
+
+hcw-athome-caregiver (5.2.23) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * New release 5.2.18
+
+  [ Gor Grigoryan ]
+  * refs #7771, Button are on people face during call on mobile
+  * add closing call when not ringing in patient side
+  * refs #7817, imporove metadata in pdf
+
+  [ Weblate ]
+  * Update translation files
+
+  [ Gor Grigoryan ]
+  * ui fixes
+  * mobile ui fixes
+  * add video and audoi calls in consultation history report
+
+ -- Gor Grigoryan <gorgrigoryan1997@gmail.com>  Tue, 05 Nov 2024 15:49:11 +0000
+
+hcw-athome-caregiver (5.2.18) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * imporove general information
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 30 Oct 2024 11:43:04 +0100
+
+hcw-athome-caregiver (5.2.17) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * New release 5.2.16
+
+  [ Gor Grigoryan ]
+  * make display meta translatable
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 30 Oct 2024 10:57:16 +0100
+
+hcw-athome-caregiver (5.2.16) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Translated using Weblate (French)
+  * New release 5.2.15
+
+  [ Gor Grigoryan ]
+  * handle metadata missing translation in overlay
+  * fix resize button
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 29 Oct 2024 13:29:36 +0100
+
+hcw-athome-caregiver (5.2.15) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * use browser language for invite form if DEFAULT_PATIENT_LOCALE is not set in env
+  * translate form meta
+  * hande missing translation for invite form dynamic fields
+  * fix pdf image preview
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 25 Oct 2024 15:32:05 +0200
+
+hcw-athome-caregiver (5.2.13) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * fix pdf PDF from history with long label
+  * terms page fix for fallback
+  * add pictures in PDF
+  * add metadata in invite form
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 17 Oct 2024 16:24:55 +0200
+
+hcw-athome-caregiver (5.2.12) focal; urgency=medium
+
+  * hide translator invite checkbox
+  * change error snackbar colors
+  * imporove list in markdown
+
+ -- Gor Grigoryan <gorgrigoryan1997@gmail.com>  Tue, 15 Oct 2024 07:37:02 +0000
+
+hcw-athome-caregiver (5.2.9) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * New release 5.2.8
+
+  [ Gor Grigoryan ]
+  * fix create invite with patient timezone
+  * update invite fixes
+
+ -- Gor Grigoryan <gorgrigoryan1997@gmail.com>  Sat, 12 Oct 2024 15:35:30 +0000
+
+hcw-athome-caregiver (5.2.8) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * show proper error
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 11 Oct 2024 18:31:49 +0200
+
+hcw-athome-caregiver (5.2.7) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * fix invite form time select
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 11 Oct 2024 17:30:51 +0200
+
+hcw-athome-caregiver (5.2.6) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * add some missing translations
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 11 Oct 2024 13:29:05 +0200
+
+hcw-athome-caregiver (5.2.5) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * add language selector in terms page
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 10 Oct 2024 13:31:52 +0200
+
+hcw-athome-caregiver (5.2.4) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * refs #7638, Remove footer in consultation overview
+  * refs #6555, Enable some options in invite break the form
+  * make dialogdata optional in cgu
+  * change terms default src
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 09 Oct 2024 17:08:18 +0200
+
+hcw-athome-caregiver (5.2.3) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * New release 5.2.2
+  * Add version in root html
+
+  [ Gor Grigoryan ]
+  * add timezone select
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 08 Oct 2024 15:15:08 +0200
+
+hcw-athome-caregiver (5.2.2) focal; urgency=medium
+
+  * refs #7621 - fix cache management by adding hash of files
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 02 Oct 2024 14:35:08 +0200
+
+hcw-athome-caregiver (5.2.1) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Switch to node 20
+
+  [ Gor Grigoryan ]
+  * change terminate consultation button design
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 02 Oct 2024 13:53:34 +0200
+
+hcw-athome-caregiver (0.5.1.15) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * remove mat card outline appearance
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 30 Sep 2024 13:52:01 +0200
+
+hcw-athome-caregiver (0.5.1.14) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * build fix
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 30 Sep 2024 13:39:30 +0200
+
+hcw-athome-caregiver (0.5.1.13) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * refs ##6555, Enable some options in invite break the form
+  * update to 15
+  * migration
+  * migration
+  * remove unused code
+  * ui update
+  * update ngx-markdown
+  * update to 17
+  * some ui updates
+  * ui imporovements
+  * implement angular material 17
+  * remove unused styles
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 30 Sep 2024 13:00:51 +0200
+
+hcw-athome-caregiver (5.2.0) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * refs ##6555, Enable some options in invite break the form
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 24 Sep 2024 16:38:02 +0200
+
+hcw-athome-caregiver (5.1.12) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Update translation
+
+  [ Weblate Admin ]
+  * Translated using Weblate (French)
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 24 Sep 2024 11:55:18 +0200
+
+hcw-athome-caregiver (5.1.11) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * terms modal imporovements
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 24 Sep 2024 11:38:15 +0200
+
+hcw-athome-caregiver (5.1.10) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * hide go home from terms
+
+  [ Weblate Admin ]
+  * Translated using Weblate (French)
+
+  [ Gor Grigoryan ]
+  * change cgu page
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 24 Sep 2024 11:08:54 +0200
+
+hcw-athome-caregiver (5.1.9) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * handle login errors
+  * refs   #6829,  Add Terms acceptance for Doctor
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 24 Sep 2024 08:24:55 +0200
+
+hcw-athome-caregiver (0.5.1.8) focal; urgency=medium
+
+  [ Aram ]
+  * feat: twilio whatsapp config
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 16 Sep 2024 13:43:26 +0200
+
+hcw-athome-caregiver (5.1.1) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * remove log
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 22 Jul 2024 09:58:07 +0200
+
+hcw-athome-caregiver (5.1.0) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * remove log
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 22 Jul 2024 09:57:41 +0200
+
+hcw-athome-caregiver (5.0.14) focal; urgency=medium
+
+  * Fix translation
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 11 Jul 2024 15:04:24 +0200
+
+hcw-athome-caregiver (0.5.0.13) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * New release 5.0.12
+
+  [ Gor Grigoryan ]
+  * add translations and toaster
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 11 Jul 2024 14:27:24 +0200
+
+hcw-athome-caregiver (0.5.0.12) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Update translation
+
+  [ Weblate Admin ]
+  * Translated using Weblate (English)
+  * Translated using Weblate (French)
+
+  [ Gor Grigoryan ]
+  * add invite with link modal
+  * ui imporovements
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 11 Jul 2024 10:14:30 +0200
+
+hcw-athome-caregiver (5.0.11) focal; urgency=medium
+
+  * Fix json formating for french
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 30 May 2024 13:14:09 +0200
+
+hcw-athome-caregiver (5.0.10) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Translated using Weblate (French)
+  * Add script to permit to override languages
+  * Fix dashboard translation
+
+  [ Gor Grigoryan ]
+  * refs #6776, Have a way to change language
+  * env update
+  * remove unused styles
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 30 May 2024 08:46:12 +0200
+
+hcw-athome-caregiver (5.0.9) focal; urgency=medium
+
+  * Fix cache policy for markdown files and add proxy-revalidate for index.html
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 15 May 2024 16:18:00 +0200
+
+hcw-athome-caregiver (0.5.0.8) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Translated using Weblate (French)
+  * Translated using Weblate (English)
+  * Translated using Weblate (French)
+
+  [ Gor Grigoryan ]
+  * fix experts validator in create invite
+  * refs #6636, Add /cgu route to doctor interface
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 15 May 2024 08:40:33 +0200
+
+hcw-athome-caregiver (5.0.7) focal; urgency=medium
+
+  * Rollback change b7ecdf87
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 07 May 2024 09:40:19 +0200
+
+hcw-athome-caregiver (5.0.6) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * fix copy expert link
+  * add ability to send whatsapp sms
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 07 May 2024 09:20:26 +0200
+
+hcw-athome-caregiver (5.0.5) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * fix pdf download issue
+  * refs #6482, Improve error when no SMS provider configured
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 26 Mar 2024 16:01:02 +0100
+
+hcw-athome-caregiver (5.0.4) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * build fix
+
+  [ Weblate Admin ]
+  * Translated using Weblate (French)
+
+  [ Gor Grigoryan ]
+  * refs #6532, add button if no consultation to invite user to start by sending invite
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 05 Mar 2024 12:56:59 +0100
+
+hcw-athome-caregiver (5.0.3) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * refs #6179, Improve PDF report
+  * add doctor external link
+  * refs #6268, Add new allowed mimetype parameters in backend
+  * Add footer.md into doctor, improve pdf report
+  * localeid based on translate
+  * update to 15
+  * update to 16
+  * updates
+  * update material
+  * custom pagination and date-time picker
+  * add filters
+  * translation and ui fixes
+  * changed buttons style
+  * profile page ui changes
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 30 Jan 2024 23:19:59 +0100
+
+hcw-athome-caregiver (5.0.2) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * fix doctor video
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 28 Dec 2023 09:30:39 +0100
+
+hcw-athome-caregiver (5.0.1) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * add new consultation form button
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 22 Dec 2023 13:24:18 +0100
+
+hcw-athome-caregiver (5.0.0) focal; urgency=medium
+
+  * Version 5.0.0
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 15 Dec 2023 08:55:35 +0100
+
+hcw-athome-caregiver (0.4.3.84) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * add ability to upload gif
+  * fix nurse online ofline status
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 13 Dec 2023 16:42:28 +0100
+
+hcw-athome-caregiver (0.4.3.83) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * logout user adter 9 reconnect error
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 12 Dec 2023 10:41:04 +0100
+
+hcw-athome-caregiver (0.4.3.82) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * refs #6243, Token not refreshed if expired and websocket disconnects
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 11 Dec 2023 10:16:00 +0100
+
+hcw-athome-caregiver (0.4.3.81) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * minor style fix
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 07 Dec 2023 22:15:04 +0100
+
+hcw-athome-caregiver (0.4.3.80) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * fix widget container
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 07 Dec 2023 16:40:17 +0100
+
+hcw-athome-caregiver (0.4.3.79) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Update translatipon
+
+  [ Gor Grigoryan ]
+  * minor style fixes
+  * remove footer
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 07 Dec 2023 11:16:52 +0100
+
+hcw-athome-caregiver (0.4.3.78) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * fix global styles add dot loader
+  * change doctor app primary color to read from backend
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 07 Dec 2023 08:40:29 +0100
+
+hcw-athome-caregiver (0.4.3.77) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Update default upload size to 20M
+
+  [ Gor Grigoryan ]
+  * refs #6259, Adding expert when patient info filled validate the modal
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 05 Dec 2023 13:40:28 +0100
+
+hcw-athome-caregiver (0.4.3.76) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * refs #6152, Call hangup after 30 minutes
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 05 Dec 2023 10:44:34 +0100
+
+hcw-athome-caregiver (0.4.3.75) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * refs #6250, White field name is almost invisible
+  * refs #6246, Incoming consultion has General queue name with websocket
+  * refs #6248, Add 'Requested by' column in new and opened consultation queue
+  * refs #6122, Implement Matomo (analytics)
+  * refs #6251,messages returns too many information relative to doctor
+  * config fix
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 01 Dec 2023 08:29:03 +0100
+
+hcw-athome-caregiver (0.4.3.74) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * add translation
+  * refs #6125, Display proper error if no mediasoup server available
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 28 Nov 2023 09:25:00 +0100
+
+hcw-athome-caregiver (0.4.3.73) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Allow 3Mb by default
+
+  [ Gor Grigoryan ]
+  * refs #6235, Dead zone in the line
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 23 Nov 2023 16:04:36 +0100
+
+hcw-athome-caregiver (0.4.3.72) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * fix image upload issue, add error modal
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 23 Nov 2023 13:30:58 +0100
+
+hcw-athome-caregiver (0.4.3.71) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Fix nginx config
+
+  [ Gor Grigoryan ]
+  * handle expired token
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 21 Nov 2023 12:10:39 +0100
+
+hcw-athome-caregiver (0.4.3.70) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * fix downloading pdf
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 20 Nov 2023 17:45:10 +0100
+
+hcw-athome-caregiver (0.4.3.69) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Improve security headers
+
+  [ Gor Grigoryan ]
+  * remove mime-type header, add validation for uploading file
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 20 Nov 2023 15:03:17 +0100
+
+hcw-athome-caregiver (0.4.3.68) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * remove token from download file url, SENSITIVE DATA IN URL
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 20 Nov 2023 11:42:36 +0100
+
+hcw-athome-caregiver (0.4.3.67) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * add Roboto font
+  * ui fixes in chat, add some translations
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 20 Nov 2023 09:04:20 +0100
+
+hcw-athome-caregiver (0.4.3.66) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * refs #6204, Camera is not released after a video call
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 15 Nov 2023 14:11:01 +0100
+
+hcw-athome-caregiver (0.4.3.65) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Add missing translation
+
+  [ Gor Grigoryan ]
+  * stop track on destroy
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 15 Nov 2023 12:12:31 +0100
+
+hcw-athome-caregiver (0.4.3.64) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * chat scroll error fix
+  * chat scroll fix
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 14 Nov 2023 16:36:20 +0100
+
+hcw-athome-caregiver (0.4.3.63) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * empty chat error fix
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 14 Nov 2023 16:09:43 +0100
+
+hcw-athome-caregiver (0.4.3.62) focal; urgency=medium
+
+  * Adding custom script to chunk main js files
+  * cleanup useless plugin
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 14 Nov 2023 15:51:08 +0100
+
+hcw-athome-caregiver (0.4.3.61) focal; urgency=medium
+
+  * Rollback to previous build profile
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 14 Nov 2023 12:35:05 +0100
+
+hcw-athome-caregiver (0.4.3.60) focal; urgency=medium
+
+  * Split js files to chunk + fix environment
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 14 Nov 2023 12:25:16 +0100
+
+hcw-athome-caregiver (0.4.3.59) focal; urgency=medium
+
+  * Update one package
+  * Adding webpack + use npm 18
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 14 Nov 2023 12:06:45 +0100
+
+hcw-athome-caregiver (0.4.3.58) focal; urgency=medium
+
+  * Revert zone.js to 0.12
+  * New image optimization
+  * Rebuild with latest SDK
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 14 Nov 2023 10:31:50 +0100
+
+hcw-athome-caregiver (0.4.3.57) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Adding missing translation
+
+  [ Gor Grigoryan ]
+  * update hcw-stream-lib
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 13 Nov 2023 12:11:43 +0100
+
+hcw-athome-caregiver (0.4.3.56) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * chat scroll fix
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Sat, 11 Nov 2023 10:14:46 +0100
+
+hcw-athome-caregiver (0.4.3.55) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * default language en if no translation
+
+  [ Olivier Bitsch ]
+  * translation files + npm package update
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 10 Nov 2023 15:06:19 +0100
+
+hcw-athome-caregiver (0.4.3.54) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * download pdf
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 10 Nov 2023 14:41:56 +0100
+
+hcw-athome-caregiver (0.4.3.53) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * check rejectin
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 10 Nov 2023 14:27:24 +0100
+
+hcw-athome-caregiver (0.4.3.52) focal; urgency=medium
+
+  * Rollback icon change
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 10 Nov 2023 14:14:17 +0100
+
+hcw-athome-caregiver (0.4.3.51) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * updated some packages
+
+  [ Olivier Bitsch ]
+  * Do first package cleanup
+  * handled all warning on compile
+
+  [ Gor Grigoryan ]
+  * remove jquery
+
+  [ Olivier Bitsch ]
+  * Remove unused icon declaration
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 10 Nov 2023 14:04:36 +0100
+
+hcw-athome-caregiver (0.4.3.50) focal; urgency=medium
+
+  * Update nginx configuration file (security reason)
+  * Update nginx configuration file (security reason)
+  * Enable nginx compression on various mimetypes
+  * Image optimization + angular version fixes
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 10 Nov 2023 08:26:24 +0100
+
+hcw-athome-caregiver (0.4.3.49) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * text change in consultation detail
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 01 Nov 2023 12:50:02 +0100
+
+hcw-athome-caregiver (0.4.3.48) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * change openid login url
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 26 Oct 2023 17:08:27 +0200
+
+hcw-athome-caregiver (0.4.3.47) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * requester name
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 25 Oct 2023 13:29:27 +0200
+
+hcw-athome-caregiver (0.4.3.46) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * close room on destroy
+  * position fix
+  * update hcw-stream-lib
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 04 Oct 2023 14:00:39 +0200
+
+hcw-athome-caregiver (0.4.3.41) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Retrigger build
+
+  [ Gor Grigoryan ]
+  * refs #6151, Add mute button for doctor
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 29 Sep 2023 11:35:29 +0200
+
+hcw-athome-caregiver (0.4.3.38) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * rerange video room
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 28 Sep 2023 11:59:19 +0200
+
+hcw-athome-caregiver (0.4.3.37) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Add build for docker and podman in makefile
+
+  [ Gor Grigoryan ]
+  * redesign invite expert modal, add confirmation
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 26 Sep 2023 15:18:47 +0200
+
+hcw-athome-caregiver (0.4.3.36) focal; urgency=medium
+
+  * Adding healthcheck URL
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 25 Sep 2023 09:38:21 +0200
+
+hcw-athome-caregiver (0.4.3.35) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * refs #6112 , Have default languages defined by default without the need to create mongo entry
+  * remove unused code
+  * refs #6125, Display proper error if no mediasoup server available
+  * add details
+  * refs #6118, Add Invite expert from Invite form, #6119 Create modal on Invite Expert button
+  * invite expert email or sms
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 19 Sep 2023 09:34:46 +0200
+
+hcw-athome-caregiver (0.4.3.34) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * add locale in req headers
+
+  [ Olivier Bitsch ]
+  * Fix URL rooting in nginx docker
+  * Add root-less configuration
+  * Use root-less ready container
+  * Fix nginx warning + change default port
+  * Fix yarn and nginx config
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 06 Sep 2023 13:42:57 +0200
+
+hcw-athome-caregiver (0.4.3.33) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * open id button fix
+  * fix redirection
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 11 Aug 2023 16:56:10 +0200
+
+hcw-athome-caregiver (0.4.3.32) focal; urgency=medium
+
+  [ Aram ]
+  * feat: add OpenId integration
+
+  [ Gor Grigoryan ]
+  * change genral information ui
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 11 Aug 2023 11:38:25 +0200
+
+hcw-athome-caregiver (0.4.3.31) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Dockerization
+
+  [ Gor Grigoryan ]
+  * add sender name under message,fix direction of messages
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 07 Aug 2023 17:06:29 +0200
+
+hcw-athome-caregiver (0.4.3.30) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * add expert status
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 03 Aug 2023 16:55:46 +0200
+
+hcw-athome-caregiver (0.4.3.29) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * refs #6016 , add invite expert snackBar
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Thu, 27 Jul 2023 13:29:33 +0200
+
+hcw-athome-caregiver (0.4.3.28) focal; urgency=medium
+
+  [ Gor Grigoryan ]
+  * refs: #6016: Add new link used to invite third party user into opened consultation
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 21 Jul 2023 13:26:03 +0200
+
+hcw-athome-caregiver (0.4.3.27) focal; urgency=medium
+
+  [ YassineEF ]
+  * Fixed error of metadata object null value
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 16 Sep 2022 16:53:22 +0200
+
+hcw-athome-caregiver (4.3.20) focal; urgency=medium
+
+  [ YassineEF ]
+  * Fixed error of blank metadata DISPLAY META
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 16 Sep 2022 15:04:21 +0200
+
+hcw-athome-caregiver (4.3.19) focal; urgency=medium
+
+  [ YassineEF ]
+  * refs #5029 -show metadata on waiting room from Display meta
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 13 Sep 2022 16:47:48 +0200
+
+hcw-athome-caregiver (0.4.3.19) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Rerun the build
+
+  [ YassineEF ]
+  * refs #5029 -show metadata into waiting room
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 13 Sep 2022 11:24:52 +0200
+
+hcw-athome-caregiver (0.4.3.18) focal; urgency=medium
+
+  [ YassineEF ]
+  * added metadata variable to the front
+  * Add field to the Display meta env variable
+  * Correct some views field errors
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 12 Sep 2022 10:12:59 +0200
+
+hcw-athome-caregiver (4.3.17) focal; urgency=medium
+
+  [ muhammed ]
+  * Redirect to saml provider if auth method is saml
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Fri, 08 Jul 2022 15:48:53 +0200
+
+hcw-athome-caregiver (4.3.16) focal; urgency=medium
+
+  [ muhammed ]
+  * handle errors with fetching consultations, use try catch
+  * FIX no consultation sound if consultation was created when doctor was disconnected
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Mon, 04 Jul 2022 14:42:52 +0200
+
+hcw-athome-caregiver (4.3.15) focal; urgency=medium
+
+  [ Olivier Bitsch ]
+  * Add apt update before installing repo dependancies
+  * Fix back hug-angular dependancy to the right URL
+
+  [ muhammed ]
+  * FIX circular dependency
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 29 Jun 2022 11:32:37 +0200
+
+hcw-athome-caregiver (4.3.14) focal; urgency=medium
+
+  [ muhammed ]
+  * Reload consultations after socket reconnect
+  * remove unneeded file
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Wed, 29 Jun 2022 10:20:39 +0200
+
+hcw-athome-caregiver (4.3.13) focal; urgency=medium
+
+  * Update licence
+
+ -- Olivier Bitsch <olivier.b@iabsis.com>  Tue, 03 May 2022 16:42:16 +0200
+
+hcw-athome-caregiver (4.3.12) focal; urgency=medium
+
+- Removing country flag for languages
+
+-- Olivier Bitsch <olivier.b@iabsis.com> Fri, 25 Mar 2022 16:43:01 +0100
+
+hcw-athome-caregiver (4.3.10) focal; urgency=medium
+
+[ Muhammed ]
+
+- use correct font
+- FIX: disable video for audio only calls refs #4188
+
+[ Olivier Bitsch ]
+
+- refs #4195
+- refs #4194 - remove support page
+
+-- Olivier Bitsch <olivier.b@iabsis.com> Fri, 25 Mar 2022 08:39:12 +0100
+
+hcw-athome-caregiver (4.3.9) focal; urgency=medium
+
+- Remove unwanted logo from login page
+
+-- Olivier Bitsch <olivier.b@iabsis.com> Mon, 14 Mar 2022 09:31:34 +0100
+
+hcw-athome-caregiver (4.3.8) focal; urgency=medium
+
+- Remove HUG@Home branding
+
+-- Olivier Bitsch <olivier.b@iabsis.com> Fri, 11 Mar 2022 14:33:38 +0100
+
+hcw-athome-caregiver (4.3.7) focal; urgency=medium
+
+[ Muhammed ]
+
+- use translation for connection error
+- fix dashboard cards alignment
+
+-- Olivier Bitsch <olivier.b@iabsis.com> Fri, 11 Mar 2022 09:13:26 +0100
+
+hcw-athome-caregiver (4.3.6) focal; urgency=medium
+
+[ Muhammed ]
+
+- FIX audio volume indicator refs #4143
+
+-- Olivier Bitsch <olivier.b@iabsis.com> Wed, 09 Mar 2022 12:19:47 +0100
+
+hcw-athome-caregiver (4.3.5) focal; urgency=medium
+
+- Put back @Home in sidebar
+
+-- Olivier Bitsch <olivier.b@iabsis.com> Mon, 07 Mar 2022 15:47:21 +0100
+
+hcw-athome-caregiver (4.3.4) focal; urgency=medium
+
+[ Muhammed ]
+
+- get and display logo from config refs #4114
+
+[ Olivier Bitsch ]
+
+- Updating favicon
+
+-- Olivier Bitsch <olivier.b@iabsis.com> Mon, 07 Mar 2022 15:27:39 +0100
+
+hcw-athome-caregiver (4.3.3) focal; urgency=medium
+
+[ Muhammed ]
+
+- adjust login page styles
+
+-- Olivier Bitsch <olivier.b@iabsis.com> Tue, 01 Mar 2022 17:50:33 +0100
+
+hcw-athome-caregiver (4.3.2) focal; urgency=medium
+
+- Initial Release.
+
+-- Olivier Bitsch <olivier.b@iabsis.com> Thu, 24 Feb 2022 15:09:34 +0100

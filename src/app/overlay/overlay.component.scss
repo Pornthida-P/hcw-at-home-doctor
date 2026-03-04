@@ -1,0 +1,436 @@
+.elements-header {
+  margin-top: 0;
+  margin-bottom: 20px
+}
+
+.elements-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.resume-element {
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.resume-value {
+  font-size: 1em;
+  padding-top: 5px;
+}
+
+.resume-label {
+  color: #ccc;
+  font-size: 0.7em;
+}
+
+.overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: block; /* Hidden by default */
+  width: 100vw; /* Full width (cover the whole page) */
+  height: 100vh; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75); /* Black background with opacity */
+  z-index: 1011; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+
+.overlay-content {
+  top: 10px;
+  width: 70%;
+  right: 15%;
+  height: 50%;
+  z-index: 130;
+  min-height: 400px;
+  position: absolute;
+  background-color: white;
+}
+
+.overlay-header {
+  padding: 30px;
+  color: var(--app-white);
+  background-color: var(--primary-color);
+}
+
+.chat-cont {
+  right: 0;
+  height: 100%;
+  z-index: 112;
+  width: 33.33%;
+  position: fixed;
+  min-width: 400px;
+  background-color: #fafafa;
+
+  @media (max-width: 600px) {
+    width: 100%;
+    overflow: auto;
+  }
+}
+
+.overlay-button {
+  margin-top: auto;
+  @media (max-width: 600px) {
+    margin-top: unset;
+  }
+}
+
+.header {
+  top: 0;
+  margin: 0;
+  padding: 0;
+  z-index: 100;
+  width: 33.33%;
+  position: fixed;
+  min-width: 400px;
+  background-color: var(--app-white);
+  border-bottom: 1px solid rgb(209, 209, 209);
+
+  .close-icon {
+    top: 10px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    font-size: 30px;
+    font-weight: 700;
+    position: absolute;
+  }
+
+  @media (max-width: 600px) {
+    width: 100%;
+    height: 50px;
+
+  }
+}
+
+.header h3 {
+  font-size: 1.3em;
+  padding-top: 18px;
+  padding-left: 20px;
+  font-weight: 500;
+}
+
+.header div {
+  height: 100%;
+  display: inline-block;
+  width: 24.333%;
+  text-align: center;
+}
+
+.bubble {
+  border-radius: 6px;
+}
+
+.incoming > div > div.bubble {
+  background-color: var(--primary-color);
+  color: #ffffff;
+
+  padding: 8px 14px 8px 14px;
+}
+
+span.msg-time {
+  margin-top: 6px;
+  font-size: 10px;
+  color: rgb(58, 58, 58);
+}
+
+div.msg-time {
+  min-width: 80%;
+  flex-direction: row-reverse;
+}
+
+.outgoing,
+.incoming {
+  width: 70%;
+  margin-top: 16px;
+}
+
+.outgoing {
+  margin-left: 30%;
+}
+
+.outgoing > div > div.bubble {
+  padding: 8px 14px 8px 14px;
+
+  color: rgb(58, 58, 58);
+  background-color: var(--app-white);
+
+  margin-right: 0;
+}
+
+.outgoing div.msg-time {
+  justify-content: flex-end;
+}
+
+.outgoing span.msg-time {
+  text-align: right;
+  float: right;
+}
+
+.bubble p {
+  font-size: 13px;
+}
+
+div.resume-c-btn {
+  text-align: center;
+
+  background-color: var(--primary-color);
+  color: var(--app-white);
+  display: table-cell;
+  vertical-align: middle;
+  cursor: pointer;
+  line-height: 406%;
+
+  right: 0;
+  position: fixed;
+
+  margin: 0;
+  padding: 0;
+
+  bottom: 0;
+  height: 70px;
+  z-index: 120;
+
+  width: 33.33%;
+  min-width: 400px;
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
+}
+
+div.btns {
+  right: 0;
+  margin: 0;
+  padding: 0;
+  bottom: 0;
+  height: 70px;
+  z-index: 120;
+  display: flex;
+  position: fixed;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  color: var(--app-white);
+  width: 33.33%;
+  min-width: 400px;
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
+
+  .transfer, .resume, .close {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+div.btns .close {
+  background-color: var(--app-red);
+  border-top-left-radius: 16px;
+
+  &.withoutBorder {
+    border-top-left-radius: 0;
+  }
+}
+
+div.btns .resume {
+  background-color: var(--app-green);
+  border-top-right-radius: 16px;
+}
+
+div.btns .transfer {
+  background-color: var(--primary-color);
+  border-top-left-radius: 16px;
+}
+
+.btn {
+  position: absolute;
+  bottom: 10%;
+  padding: 2px 16px;
+  display: block;
+  border-radius: 60px;
+  text-align: center;
+  color: var(--app-white);
+  background-color: var(--primary-color);
+}
+
+.btn.danger {
+  background-color: var(--app-red);
+}
+
+div.act-cont {
+  position: relative;
+  padding: 30px;
+  flex: 1;
+  text-align: center;
+
+  @media (max-width: 600px) {
+    padding: 0;
+  }
+}
+
+.act-cont p {
+  line-height: 1.6;
+  font-weight: 200;
+}
+
+.ratings {
+  text-align: center;
+
+  div {
+    display: inline-block;
+    height: 60px;
+    width: 60px;
+    border-radius: 20px;
+    cursor: pointer;
+    border: 2px solid #ddd;
+    margin: 0 20px;
+    padding: 10px;
+    background: var(--app-white);
+
+    &.selected {
+      border-color: var(--primary-color);
+    }
+
+    img {
+      max-width: 100%;
+    }
+  }
+}
+
+textarea {
+  color: #444;
+  width: 94%;
+  resize: vertical;
+  font-size: 0.9em;
+  min-height: 100px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+textarea:focus {
+  border-color: var(--primary-color);
+}
+
+.buttons {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.feedback-saved {
+  color: #00b54a;
+  padding-top: 40px;
+
+  span {
+    display: inline-block;
+    background: #00b54a;
+    color: #fff;
+    border-radius: 5px;
+    padding: 6px 12px;
+    margin-right: 20px;
+  }
+}
+
+.feedback-overlay {
+
+  .feedback-overlay-content {
+    @media (max-width: 600px) {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+}
+
+.close-content {
+
+  .close-content-inner {
+    top: 20%;
+    right: 15%;
+    width: 70%;
+    z-index: 130;
+    min-height: 300px;
+    position: absolute;
+    background-color: var(--app-white);
+
+    @media (max-width: 600px) {
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+
+    .header {
+      width: 100%;
+      min-width: 100%;
+      position: static;
+      text-align: center;
+
+      h2 {
+        font-weight: 200
+      }
+    }
+
+    .actions-wrapper {
+      height: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      background-color: #f2f7f7;
+
+
+      @media (max-width: 600px) {
+        height: 100svh;
+        flex-direction: column;
+      }
+
+      .act-cont {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        &:not(:last-child) {
+          @media (min-width: 600px) {
+            border-right: 1px solid #cacaca;
+          }
+
+        }
+
+        .btn {
+          @media (min-width: 600px) {
+            margin-top: auto;
+          }
+          position: sticky;
+          bottom: 0;
+        }
+
+
+        @media (max-width: 600px) {
+          border-bottom: 1px solid #cacaca;
+        }
+      }
+    }
+  }
+}
+
+.overlay-wrapper {
+  top: 60px;
+  width: 100%;
+  position: absolute;
+  height: calc(100% - 150px);
+
+
+  @media (max-width: 600px) {
+    top: 60px;
+
+  }
+
+}
