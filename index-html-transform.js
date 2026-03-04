@@ -5,7 +5,7 @@ const addScript = (path)=>{
     return `<script type="module" src="${path}"></script>`
 }
 module.exports = (targetOptions, indexHtml) =>{
-    const vendor_path = node_path.resolve(__dirname+`/dist/hug-at-home`);
+    const vendor_path = node_path.resolve(__dirname+`/dist/hcw-at-home-doctor`);
     let vendorScripts = ``;
     fs.readdirSync(vendor_path).forEach((file)=>{
         if(file.indexOf('main-')===0){

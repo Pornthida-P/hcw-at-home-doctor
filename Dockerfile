@@ -9,7 +9,7 @@ RUN apk add --no-cache make
 RUN make
 
 FROM docker.io/nginxinc/nginx-unprivileged:1.28-bookworm
-COPY --from=builder /usr/src/app/dist/hug-at-home/ /usr/share/nginx/html/
+COPY --from=builder /usr/src/app/dist/hcw-at-home-doctor/ /usr/share/nginx/html/
 COPY nginx-docker.conf.template /etc/nginx/templates/default.conf.template
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY .version /usr/share/nginx/html/version
