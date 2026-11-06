@@ -1,15 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpResponse } from '@angular/common/http';
-import { map, tap } from 'rxjs/operators';
+import { debounceTime, filter, map, skip, tap } from 'rxjs/operators';
 import moment from 'moment-timezone';
 import { IStepOption, TourService } from 'ngx-ui-tour-md-menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { Invitation } from '../Invitation';
-import { Observable, of, Subscription } from 'rxjs';
+import { fromEvent, merge, Observable, of, Subscription } from 'rxjs';
 import { InviteService } from '../core/invite.service';
+import { ConsultationService } from '../core/consultation.service';
 import { InviteFormComponent } from '../invite-form/invite-form.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -34,6 +35,7 @@ export class InvitationsComponent implements OnInit, OnDestroy {
   currentInvites: Invitation[] = [];
   invitations: Observable<Invitation[] | HttpResponse<Invitation[]>> = of([]);
   private stepHideSubscription: Subscription;
+  private refreshSubscription: Subscription;
 
   constructor(
     private router: Router,
@@ -44,12 +46,29 @@ export class InvitationsComponent implements OnInit, OnDestroy {
     public configService: ConfigService,
     private activeRoute: ActivatedRoute,
     private inviteService: InviteService,
+    private consultationService: ConsultationService,
   ) {}
 
   ngOnInit() {
     this.getInvites(1);
     this.inviteId = this.activeRoute.snapshot.params['id'];
     this.listenToTourSubscriptions();
+    this.listenToInviteUpdates();
+  }
+
+  listenToInviteUpdates() {
+    this.refreshSubscription = merge(
+      this.consultationService.consultationsOverviewSub.pipe(skip(1)),
+      fromEvent(document, 'visibilitychange').pipe(
+        filter(() => document.visibilityState === 'visible')
+      )
+    )
+      .pipe(debounceTime(1000))
+      .subscribe(() => {
+        if (!this.loading) {
+          this.getInvites(this.page, true);
+        }
+      });
   }
 
   listenToTourSubscriptions() {
@@ -124,9 +143,9 @@ export class InvitationsComponent implements OnInit, OnDestroy {
     });
   }
 
-  getInvites(page) {
+  getInvites(page, silent = false) {
     this.page = page;
-    this.loading = true;
+    this.loading = !silent;
     this.invitations = this.inviteService
       .getInvitations((this.page - 1) * 10, 10)
       .pipe(
@@ -139,14 +158,30 @@ export class InvitationsComponent implements OnInit, OnDestroy {
           this.currentInvite = this.currentInvites.find(
             i => i.id === this.inviteId
           );
-          if (this.currentInvite) {
+          if (this.currentInvite && !silent) {
             this.openDialog(this.currentInvite, true);
+          } else if (this.inviteId && !this.currentInvite && !silent) {
+            this.openInviteById(this.inviteId);
           }
         }),
         map(resp => {
           return (resp as HttpResponse<Invitation[]>).body;
         })
       );
+  }
+
+  openInviteById(id: string) {
+    this.inviteService.getInvite(id).subscribe({
+      next: invite => {
+        if (invite && invite.id === this.inviteId) {
+          this.currentInvite = invite;
+          this.openDialog(invite, true);
+        }
+      },
+      error: () => {
+        this.router.navigate(['/invitations']);
+      },
+    });
   }
 
   resendInvite(id) {
@@ -225,6 +260,10 @@ export class InvitationsComponent implements OnInit, OnDestroy {
 
   getInviteLink(id: string) {
     const invite = this.currentInvites.find(i => i.id === id);
+    if (invite?.status === 'CANCELED') {
+      this.showCanceledLinkMessage();
+      return;
+    }
     if (invite) {
       invite.gettingLink = true;
     }
@@ -240,6 +279,8 @@ export class InvitationsComponent implements OnInit, OnDestroy {
             data: { link: res.patientURL },
             autoFocus: false,
           });
+        } else if (res?.status === 'CANCELED') {
+          this.showCanceledLinkMessage();
         } else {
           this.snackBar.open(
             this.translate.instant('invitations.errorGettingLink'),
@@ -269,6 +310,18 @@ export class InvitationsComponent implements OnInit, OnDestroy {
     });
   }
 
+  showCanceledLinkMessage() {
+    this.snackBar.open(
+      this.translate.instant('invitations.linkUnavailableCanceled'),
+      'X',
+      {
+        verticalPosition: 'top',
+        horizontalPosition: 'right',
+        duration: 4000,
+      }
+    );
+  }
+
   getFormattedDate(utcTimestamp: number, timezone: string) {
     return moment(utcTimestamp).tz(timezone).format('D MMM YYYY HH:mm');
   }
@@ -277,6 +330,7 @@ export class InvitationsComponent implements OnInit, OnDestroy {
     if (this.stepHideSubscription) {
       this.stepHideSubscription?.unsubscribe();
     }
+    this.refreshSubscription?.unsubscribe();
   }
 
   protected readonly Array = Array;

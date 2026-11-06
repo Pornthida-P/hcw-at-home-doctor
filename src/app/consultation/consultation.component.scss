@@ -146,6 +146,23 @@
       margin: 0;
     }
 
+    h1 {
+      text-align: center;
+      margin: 0 0 16px;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--primary-color);
+    }
+
+    p.no-device {
+      color: #f44336;
+    }
+
+    p.device-name {
+      font-weight: 500;
+      word-break: break-word;
+    }
+
     .left,
     .right {
       display: inline-block;

@@ -37,15 +37,17 @@ export class SelectLanguageComponent {
   selectedLanguage;
 
   constructor(public translate: TranslateService) {
-    this.selectedLanguage = localStorage.getItem("hhw-lang") || supportedLanguages[0];
+    const savedLang = localStorage.getItem("hhw-lang");
+    this.selectedLanguage = supportedLanguages.includes(savedLang) ? savedLang : (translate.currentLang || supportedLanguages[0]);
   }
 
   openDropdown() {
     this.opened = !this.opened
   }
 
-  onLanguageSelect(lang) {
+  onLanguageSelect(target) {
     this.openDropdown()
+    const lang = target && target.value ? target.value : target
     window.localStorage.setItem("hhw-lang", lang)
     this.translate.use(lang)
   }

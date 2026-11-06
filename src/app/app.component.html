@@ -49,7 +49,7 @@
           class="menu-btn">
           <mat-icon
             svgIcon="chat"
-            [matBadgeHidden]="false"
+            [matBadgeHidden]="!activeConsultations"
             matBadgePosition="below after"
             [matBadge]="activeConsultations || ''"
             matBadgeColor="warn"></mat-icon>
@@ -104,4 +104,13 @@
 </ng-container>
 
 <router-outlet *ngIf="!isLoggedIn"></router-outlet>
+<div
+  *ngIf="!initialNavigationDone"
+  class="app-boot-loader"
+  style="z-index: 999"
+  role="status"
+  aria-live="polite">
+  <div class="app-boot-loader__spinner"></div>
+  <span>{{ 'app.loading' | translate }}</span>
+</div>
 <tour-step-template></tour-step-template>

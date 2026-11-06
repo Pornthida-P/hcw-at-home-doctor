@@ -1,5 +1,5 @@
-import { Subscription } from "rxjs";
-import { Stream, LogService } from "hcw-stream-lib";
+import { Subscription } from 'rxjs';
+import { Stream, LogService } from 'hcw-stream-lib';
 import {
   Component,
   Input,
@@ -8,15 +8,15 @@ import {
   OnDestroy,
   AfterViewInit,
   OnChanges,
-} from "@angular/core";
+} from '@angular/core';
 
 @Component({
-  selector: "app-peer-video",
-  templateUrl: "./peer-video.component.html",
-  styleUrls: ["./peer-video.component.scss"],
+  selector: 'app-peer-video',
+  templateUrl: './peer-video.component.html',
+  styleUrls: ['./peer-video.component.scss'],
 })
 export class PeerVideoComponent implements AfterViewInit, OnDestroy, OnChanges {
-  @ViewChild("videoElement") elementRef: ElementRef;
+  @ViewChild('videoElement') elementRef: ElementRef;
 
   @Input() stream: Stream;
 
@@ -39,7 +39,7 @@ export class PeerVideoComponent implements AfterViewInit, OnDestroy, OnChanges {
   ngOnDestroy(): void {
     // Called once, before the instance is destroyed.
     // Add 'implements OnDestroy' to the class.
-    this.subscriptions.forEach((s) => s.unsubscribe());
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   ngOnChanges(changes) {

@@ -11,6 +11,7 @@ import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { jsPDF } from 'jspdf';
+import { setupPdfFonts } from '../core/pdf-fonts';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -126,10 +127,21 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
     this.title = this.titles.find(t => t.status === this.status);
     this.getConsultations();
     this.getUnreadCount();
+    this.refreshOverview();
     this.getQueues();
     this.breakpointObserver.observe([Breakpoints.XSmall]).subscribe(result => {
       this.isMobile = result.matches;
     });
+  }
+
+  // Resync the list and the sidebar badges with the server, in case a
+  // socket event (accepted, canceled, closed) was missed.
+  refreshOverview() {
+    if (this.status !== 'closed') {
+      this.consultationService.loadConsultationOverview().subscribe({
+        error: err => console.warn('Could not refresh consultations', err),
+      });
+    }
   }
 
   getQueues() {
@@ -377,6 +389,26 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
     });
   }
 
+  compressImage(image: HTMLImageElement, fallback: string): string {
+    try {
+      if (!image.width || !image.height) {
+        return fallback;
+      }
+      const maxSize = 1200;
+      const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(image.width * scale);
+      canvas.height = Math.round(image.height * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL('image/jpeg', 0.75);
+    } catch (err) {
+      return fallback;
+    }
+  }
+
   adjustMsg(msg, consultationId) {
     return new Promise(resolve => {
       if (msg.type === 'ownershipTransfer') {
@@ -427,7 +459,18 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
           res.map(m => this.adjustMsg(m, data._id || data.id))
         );
         const doc = new jsPDF();
+        // Embed a Unicode (Thai + Latin) font; doc.text() is Thai-shaped
+        const pdfFont = await setupPdfFonts(doc);
         const getLabelWidth = (text: string) => doc.getTextWidth(text) + 2;
+        const pdfLang = (this.translate.currentLang || localStorage.getItem('hhw-lang')) === 'th' ? 'th' : 'en';
+        const formatPdfDate = (value, format: string) =>
+          this.datePipe.transform(value, format, undefined, pdfLang) || '';
+        const genderKey = data.gender ? `inviteForm.${String(data.gender).toLowerCase()}` : '';
+        const genderText = genderKey
+          ? this.translate.instant(genderKey) !== genderKey
+            ? this.translate.instant(genderKey)
+            : `${data.gender}`
+          : '-';
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
         const imageUrl = this.configService.config?.logo;
@@ -495,7 +538,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
         const labelValueGap = 20;
         const lineHeight = 5;
 
-        doc.setFont('Helvetica', 'normal', 400);
+        pdfFont.setFont('normal');
         doc.setFontSize(22);
         doc.text(
           this.translate.instant('pdf.consultationReport'),
@@ -516,7 +559,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
 
           doc.setFontSize(10);
           doc.setTextColor('#000');
-          doc.setFont('Helvetica', 'normal', 700);
+          pdfFont.setFont('bold');
           const doctorFirstnameLabel = this.translate.instant('pdf.firstname') + ':';
           const doctorLastnameLabel = this.translate.instant('pdf.lastname') + ':';
           doc.text(
@@ -530,7 +573,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
             yPosition + lineHeight
           );
 
-          doc.setFont('Helvetica', 'normal', 400);
+          pdfFont.setFont('normal');
           doc.text(`${doctor.firstName}`, leftColX + getLabelWidth(doctorFirstnameLabel), yPosition);
           doc.text(
             `${doctor.lastName}`,
@@ -551,7 +594,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
 
         doc.setFontSize(10);
         doc.setTextColor('#000');
-        doc.setFont('Helvetica', 'normal', 700);
+        pdfFont.setFont('bold');
         const patientFirstnameLabel = this.translate.instant('pdf.firstname') + ':';
         const patientLastnameLabel = this.translate.instant('pdf.lastname') + ':';
         const patientGenderLabel = this.translate.instant('pdf.gender') + ':';
@@ -571,7 +614,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
           yPosition + lineHeight * 2
         );
 
-        doc.setFont('Helvetica', 'normal', 400);
+        pdfFont.setFont('normal');
         doc.text(`${data.firstName}`, leftColX + getLabelWidth(patientFirstnameLabel), yPosition);
         doc.text(
           `${data.lastName}`,
@@ -579,7 +622,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
           yPosition + lineHeight
         );
         doc.text(
-          `${data.gender}`,
+          genderText,
           leftColX + getLabelWidth(patientGenderLabel),
           yPosition + lineHeight * 2
         );
@@ -597,7 +640,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
 
           doc.setFontSize(10);
           doc.setTextColor('#000');
-          doc.setFont('Helvetica', 'normal', 700);
+          pdfFont.setFont('bold');
           const nurseFirstnameLabel = this.translate.instant('pdf.firstname') + ':';
           const nurseLastnameLabel = this.translate.instant('pdf.lastname') + ':';
           doc.text(
@@ -611,7 +654,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
             yPosition + lineHeight
           );
 
-          doc.setFont('Helvetica', 'normal', 400);
+          pdfFont.setFont('normal');
           doc.text(`${nurse.firstName}`, leftColX + getLabelWidth(nurseFirstnameLabel), yPosition);
           doc.text(
             `${nurse.lastName}`,
@@ -634,7 +677,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
           data.experts.forEach(expert => {
             doc.setFontSize(10);
             doc.setTextColor('#000');
-            doc.setFont('Helvetica', 'normal', 700);
+            pdfFont.setFont('bold');
             const expertFirstnameLabel = this.translate.instant('pdf.firstname') + ':';
             const expertLastnameLabel = this.translate.instant('pdf.lastname') + ':';
             doc.text(
@@ -648,7 +691,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
               yPosition + lineHeight
             );
 
-            doc.setFont('Helvetica', 'normal', 400);
+            pdfFont.setFont('normal');
             doc.text(
               `${expert.firstName}`,
               leftColX + getLabelWidth(expertFirstnameLabel),
@@ -675,15 +718,15 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
 
         doc.setFontSize(10);
         doc.setTextColor('#000');
-        doc.setFont('Helvetica', 'normal', 700);
+        pdfFont.setFont('bold');
         doc.text(
           this.translate.instant('pdf.startDateTime') + ':',
           leftColX,
           yPosition
         );
-        doc.setFont('Helvetica', 'normal', 400);
+        pdfFont.setFont('normal');
         doc.text(
-          `${this.datePipe.transform(data.acceptedAt, 'd MMM yyyy HH:mm', undefined, 'en')}`,
+          formatPdfDate(data.acceptedAt || data.createdAt, 'd MMM yyyy HH:mm'),
           leftColX +
             getLabelWidth(this.translate.instant('pdf.startDateTime') + ':'),
           yPosition
@@ -691,32 +734,48 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
         yPosition += lineHeight;
 
         if (data.closedAt) {
-          doc.setFont('Helvetica', 'normal', 700);
+          pdfFont.setFont('bold');
           doc.text(
             this.translate.instant('pdf.endDateTime') + ':',
             leftColX,
             yPosition
           );
-          doc.setFont('Helvetica', 'normal', 400);
+          pdfFont.setFont('normal');
           doc.text(
-            `${this.datePipe.transform(data.closedAt, 'd MMM yyyy HH:mm', undefined, 'en')}`,
+            formatPdfDate(data.closedAt, 'd MMM yyyy HH:mm'),
             leftColX +
               getLabelWidth(this.translate.instant('pdf.endDateTime') + ':'),
             yPosition
           );
           yPosition += lineHeight;
 
-          doc.setFont('Helvetica', 'normal', 700);
+          pdfFont.setFont('bold');
           doc.text(
             this.translate.instant('pdf.duration') + ':',
             leftColX,
             yPosition
           );
-          doc.setFont('Helvetica', 'normal', 400);
+          pdfFont.setFont('normal');
           doc.text(
-            `${this.durationPipe.transform(data.closedAt - data.createdAt, 'en')}`,
+            `${this.durationPipe.transform(data.closedAt - (data.acceptedAt || data.createdAt), pdfLang)}`,
             leftColX +
               getLabelWidth(this.translate.instant('pdf.duration') + ':'),
+            yPosition
+          );
+          yPosition += lineHeight;
+        } else {
+          // consultation still open: say so instead of silently omitting the end date
+          pdfFont.setFont('bold');
+          doc.text(
+            this.translate.instant('pdf.endDateTime') + ':',
+            leftColX,
+            yPosition
+          );
+          pdfFont.setFont('normal');
+          doc.text(
+            this.translate.instant('pdf.ongoing'),
+            leftColX +
+              getLabelWidth(this.translate.instant('pdf.endDateTime') + ':'),
             yPosition
           );
           yPosition += lineHeight;
@@ -725,13 +784,13 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
         yPosition += 5;
 
         if (queue?.name) {
-          doc.setFont('Helvetica', 'normal', 700);
+          pdfFont.setFont('bold');
           doc.text(
             this.translate.instant('pdf.queue') + ':',
             leftColX,
             yPosition
           );
-          doc.setFont('Helvetica', 'normal', 400);
+          pdfFont.setFont('normal');
           doc.text(
             `${queue.name}`,
             leftColX + getLabelWidth(this.translate.instant('pdf.queue') + ':'),
@@ -741,13 +800,13 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
         }
 
         if (closedByUser?.firstName) {
-          doc.setFont('Helvetica', 'normal', 700);
+          pdfFont.setFont('bold');
           doc.text(
             this.translate.instant('pdf.closedBy') + ':',
             leftColX,
             yPosition
           );
-          doc.setFont('Helvetica', 'normal', 400);
+          pdfFont.setFont('normal');
           doc.text(
             `${closedByUser.firstName} ${closedByUser.lastName}`,
             leftColX + getLabelWidth(this.translate.instant('pdf.closedBy') + ':'),
@@ -762,9 +821,9 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
             const translationKey = `pdf.metadata.${key}`;
             const translatedLabel = this.translate.instant(translationKey);
             const label = translatedLabel !== translationKey ? translatedLabel : key;
-            doc.setFont('Helvetica', 'normal', 700);
+            pdfFont.setFont('bold');
             doc.text(`${label}:`, leftColX, yPosition);
-            doc.setFont('Helvetica', 'normal', 400);
+            pdfFont.setFont('normal');
             doc.text(
               `${data.metadata[key]}`,
               leftColX + getLabelWidth(`${label}:`),
@@ -788,7 +847,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
           addPageIfNeeded(4);
           doc.setFontSize(10);
           doc.setTextColor('#000');
-          doc.setFont('Helvetica', 'normal', 700);
+          pdfFont.setFont('bold');
 
           const firstName =
             message.fromUserDetail.role === 'patient'
@@ -798,12 +857,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
             message.fromUserDetail.role === 'patient'
               ? data?.lastName
               : message.fromUserDetail.lastName || '';
-          const date = this.datePipe.transform(
-            message.createdAt,
-            'dd LLL HH:mm',
-            undefined,
-            'en'
-          );
+          const date = formatPdfDate(message.createdAt, 'dd LLL HH:mm');
           const roleKey = `roles.${message.fromUserDetail.role}`;
           const roleLabel = this.translate.instant(roleKey) || message.fromUserDetail.role;
 
@@ -813,12 +867,12 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
           doc.text(wrappedTitle, 15, yPosition);
           yPosition += wrappedTitle.length * 5;
 
-          doc.setFont('Helvetica', 'normal', 400);
+          pdfFont.setFont('normal');
           doc.setTextColor('#464F60');
 
           if (message.type === 'ownershipTransfer') {
             addPageIfNeeded(3);
-            doc.setFont('Helvetica', 'italic');
+            pdfFont.setFont('italic');
             doc.text(message.text || 'Doctor changed', 15, yPosition);
             yPosition += 5;
           } else if (message.type === 'videoCall' || message.type === 'audioCall') {
@@ -837,19 +891,14 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
             doc.text(callStatus, 15, yPosition);
             yPosition += 5;
             doc.text(
-              `${this.datePipe.transform(message.createdAt, 'dd LLL HH:mm', undefined, 'en')}`,
+              formatPdfDate(message.createdAt, 'dd LLL HH:mm'),
               15,
               yPosition
             );
             yPosition += 5;
 
             if (message.acceptedAt && message.closedAt) {
-              const closedDate = this.datePipe.transform(
-                message.closedAt,
-                'dd LLL HH:mm',
-                undefined,
-                'en'
-              );
+              const closedDate = formatPdfDate(message.closedAt, 'dd LLL HH:mm');
               doc.text(
                 `${callTypeText} ${this.translate.instant('pdf.finished')}`,
                 15,
@@ -868,8 +917,26 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
             }
           }
 
+          // Every attachment message gets a text line in the chat
+          // history ("[Attached file]: <file name>"), and images are embedded
+          // below that line when they could be loaded.
+          if (message.type === 'attachment' || message.isImage || message.isFile || message.isAudio) {
+            addPageIfNeeded();
+            pdfFont.setFont('normal');
+            doc.setTextColor('#464F60');
+            const attachmentLine = doc.splitTextToSize(
+              `${this.translate.instant('pdf.attachedFile')}: ${message.fileName || (message.isImage ? 'image' : 'file')}`,
+              pageWidth - 30
+            );
+            for (const line of attachmentLine) {
+              addPageIfNeeded();
+              doc.text(line, 15, yPosition);
+              yPosition += 5;
+            }
+          }
+
           if (message.isImage && message.attachmentsURL) {
-            await new Promise<void>(resolve => {
+            await new Promise<boolean>(resolve => {
               const image = new Image();
               image.src = message.attachmentsURL;
               image.onload = () => {
@@ -880,7 +947,7 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
                   yPosition = 10;
                 }
                 doc.addImage(
-                  message.attachmentsURL,
+                  this.compressImage(image, message.attachmentsURL),
                   'JPEG',
                   15,
                   yPosition,
@@ -890,25 +957,14 @@ export class ConsultationsComponent implements OnInit, OnDestroy {
                   'FAST'
                 );
                 yPosition += imgHeight + 5;
-                resolve();
+                resolve(true);
               };
-              image.onerror = () => resolve();
+              image.onerror = () => resolve(false);
             });
-          }
-
-          if (message.isFile && message.fileName) {
-            addPageIfNeeded();
-            doc.setFont('Helvetica', 'normal', 400);
-            doc.setTextColor('#464F60');
-            doc.text(
-              `${this.translate.instant('pdf.attachedFile')}: ${message.fileName}`,
-              15,
-              yPosition
-            );
-            yPosition += 5;
           }
         }
 
+        pdfFont.finalize(); // ToUnicode fix (copy/paste of Thai text)
         doc.save(this.translate.instant('pdf.fileName') + '.pdf');
       });
   }

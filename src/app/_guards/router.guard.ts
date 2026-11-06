@@ -9,6 +9,7 @@ import { ConsultationService } from '../core/consultation.service';
 import { AuthService } from '../auth/auth.service';
 
 import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class RouterGuard {
   consultationPath = /\/consultation\/.{24}(\/|$|\?)/;
@@ -23,9 +24,13 @@ export class RouterGuard {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> {
-    const currentUser = this.authService.currentUserValue;
+    return this.authService
+      .resolveCurrentUser()
+      .pipe(switchMap(currentUser => this.check(currentUser, state)));
+  }
 
-    if (!currentUser) {
+  private check(currentUser, state: RouterStateSnapshot): Observable<boolean> {
+    if (!currentUser || !this.authService.isAllowedUser(currentUser)) {
       this.router.navigate(['/login'], { queryParams: { returnUrl: state.url, ...state.root.queryParams } });
       return of(false);
     }

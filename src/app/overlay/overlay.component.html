@@ -35,7 +35,10 @@
           {{ 'overlay.takeOwnership' | translate }}
         </div>
       }
-      <div (click)="showCloseOverlay = true" class="close" [ngClass]="{'withoutBorder': canTransferOwnership}">
+      <div
+        (click)="showCloseOverlay = true"
+        class="close"
+        [ngClass]="{ withoutBorder: canTransferOwnership }">
         {{ 'overlay.close' | translate }}
       </div>
       <div (click)="resumeConsultation()" class="resume">
@@ -165,7 +168,7 @@
             <div class="resume-value">
               {{
                 consultation.consultation.birthDate
-                  ? (consultation.consultation.birthDate | date: 'd MMM yyyy')
+                  ? (consultation.consultation.birthDate | localDate: 'd MMM yyyy')
                   : ('overlay.notdefined' | translate)
               }}
             </div>
@@ -202,8 +205,9 @@
             </div>
             <div class="resume-value">
               {{
-                consultation.consultation.acceptedAt
-                  | date: 'd MMM yyyy HH:mm' : 'fr'
+                (consultation.consultation.acceptedAt ||
+                  consultation.consultation.createdAt)
+                  | localDate: 'd MMM yyyy HH:mm'
               }}
             </div>
           </div>
@@ -217,7 +221,7 @@
             <div class="resume-value">
               {{
                 consultation.consultation.closedAt
-                  | date: 'd MMM yyyy HH:mm' : 'fr'
+                  | localDate: 'd MMM yyyy HH:mm'
               }}
             </div>
           </div>
@@ -226,10 +230,12 @@
             *ngIf="consultation.consultation.status === 'closed'"
             class="resume-element">
             <div class="resume-label">{{ 'overlay.duration' | translate }}</div>
+            <!-- Same formula as closed-consultations history and the PDF: closedAt - (acceptedAt || createdAt) -->
             <div class="resume-value">
               {{
-                consultation.consultation.createdAt -
-                  consultation.consultation.closedAt | duration
+                consultation.consultation.closedAt -
+                  (consultation.consultation.acceptedAt ||
+                    consultation.consultation.createdAt) | duration
               }}
             </div>
           </div>
@@ -253,7 +259,7 @@
                   [class.selected]="rating === doctorRating"
                   (click)="onRatingClick(rating)">
                   <img
-                    [src]="'/assets/img/smileys/' + rating + '.png'"
+                    [src]="'assets/img/smileys/' + rating + '.png'"
                     [alt]="rating" />
                 </div>
               </ng-container>

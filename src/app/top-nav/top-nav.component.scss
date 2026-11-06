@@ -4,7 +4,7 @@
   padding: 0;
   width: 100%;
   height: 70px;
-  z-index: 100;
+  z-index: 200; /* above side-chat panel so Help stays clickable */
   display: flex;
   position: sticky;
   align-items: center;
@@ -81,6 +81,8 @@
 }
 
 .help-button {
+  position: relative;
+  z-index: 201;
   @media (max-width: 600px) {
     padding: 0;
     border: none;

@@ -73,6 +73,7 @@
               ]
             },
             "production": {
+              "baseHref": "/hcw-at-home-doctor/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",

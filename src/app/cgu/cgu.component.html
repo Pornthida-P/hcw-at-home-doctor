@@ -38,10 +38,11 @@
 
 
                 <h2>{{ 'cgu.termsAndConditions' | translate }}</h2>
-                <markdown
-                        [src]="error ? 'assets/terms.md' : 'assets/terms/' + selectedTermName">
-                    <h2>{{ 'cgu.notConfigured' | translate }}</h2>
-                </markdown>
+                <!-- Content is loaded and validated in CguComponent (never the index.html fallback) -->
+                <markdown *ngIf="termsContent" [data]="termsContent"></markdown>
+                <p class="terms-not-available" *ngIf="!termsLoading && !termsContent">
+                    {{ 'cgu.notConfigured' | translate }}
+                </p>
 
 
             </div>

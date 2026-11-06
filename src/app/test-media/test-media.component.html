@@ -1,5 +1,5 @@
 <ng-container>
-  <app-top-nav [title]="'Test son & vidéo'" [icon]="'chat'"></app-top-nav>
+  <app-top-nav [title]="'testMedia.pageTitle' | translate" [icon]="'chat'"></app-top-nav>
 
   <div id="configuration">
     <div class="container">
@@ -8,7 +8,15 @@
       </div>
       <ng-container *ngIf="!showSpinner">
         <div class="left">
-          <h2 class="error-message">{{ error }}</h2>
+          <h2 class="error-message" *ngIf="error" role="alert">{{ error }}</h2>
+          <div class="server-status" *ngIf="mediaServerStatus !== 'idle'" role="status">
+            <mat-spinner
+              *ngIf="mediaServerStatus === 'connecting'"
+              [diameter]="16"></mat-spinner>
+            <span *ngIf="mediaServerStatus === 'connecting'">{{ 'testMedia.connectingMediaServer' | translate }}</span>
+            <span *ngIf="mediaServerStatus === 'connected'" class="ok">{{ 'testMedia.mediaServerConnected' | translate }}</span>
+            <span *ngIf="mediaServerStatus === 'failed'" class="failed">{{ 'testMedia.mediaServerFailed' | translate }}</span>
+          </div>
           <h2>{{ 'testMedia.microTest' | translate }}</h2>
 
           <!-- <mat-form-field class="device--select" *ngIf="audioDevices.length > 0">
@@ -37,6 +45,13 @@
         </mat-form-field> -->
 
           <div id="video-container">
+            <video
+              #localVideo
+              *ngIf="localStream && !myCamStream"
+              class="local-preview"
+              autoplay
+              muted
+              playsinline></video>
             <app-peer-video
               #streamComponentLocal
               *ngIf="myCamStream"

@@ -47,19 +47,16 @@ import { SelectLanguageComponent } from './select-language/select-language.compo
 
 import { OverlayComponent } from './overlay/overlay.component';
 
-import { MsgTimePipe } from './msg-time.pipe';
+import { LocalDatePipe, MsgTimePipe } from './msg-time.pipe';
 import { DurationPipe } from './duration.pipe';
 import { LinkifyPipe } from './linkify.pipe';
 
 import { DatePipe, registerLocaleData } from '@angular/common';
 
-import localeFr from '@angular/common/locales/fr';
-import localeUk from '@angular/common/locales/uk';
-import localeSv from '@angular/common/locales/sv';
-import localeEs from '@angular/common/locales/es';
+import localeTh from '@angular/common/locales/th';
 
 import { ProfileUpdateComponent } from './profile-update/profile-update.component';
-import { I18nModule } from './i18n/i18n.module';
+import { I18nModule, initDoctorTranslations } from './i18n/i18n.module';
 import { ConfigService } from './core/config.service';
 
 import { HugAngularLibModule } from 'hcw-stream-lib';
@@ -69,6 +66,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { InviteExpertComponent } from './invite-expoert/invite-expert.component';
 import { PeerVideoScreenComponent } from './stream/peer-video-screen/peer-video-screen.component';
 import { ErrorDialogComponent } from './error-dialog/error-dialog.component';
+import { ImageViewerDialogComponent } from './image-viewer-dialog/image-viewer-dialog.component';
 import { DotSpinnerComponent } from './dot-spinner/dot-spinner.component';
 import { MarkdownModule } from 'ngx-markdown';
 import { TranslateService } from '@ngx-translate/core';
@@ -97,10 +95,7 @@ import { ScheduledForCardComponent } from './scheduled-for-card/scheduled-for-ca
 import { ConsultationNotFoundComponent } from './consultation-not-found/consultation-not-found.component';
 import { WebviewWarningComponent } from './webview-warning/webview-warning.component';
 
-registerLocaleData(localeFr);
-registerLocaleData(localeUk);
-registerLocaleData(localeSv);
-registerLocaleData(localeEs);
+registerLocaleData(localeTh);
 
 export function LocaleIdFactory(translateService: TranslateService) {
   return translateService.currentLang || 'en';
@@ -195,7 +190,7 @@ const routes: Routes = [
         path: 'profile',
         component: ProfileComponent,
         data: {
-          title: 'Profil',
+          title: 'Profile',
         },
         canActivate: [RouterGuard],
       },
@@ -203,7 +198,7 @@ const routes: Routes = [
         path: 'test-media',
         component: TestMediaComponent,
         data: {
-          title: 'Test son & vidéo',
+          title: 'Media test',
         },
         canActivate: [RouterGuard],
       },
@@ -235,7 +230,7 @@ const routes: Routes = [
     path: 'reset-password',
     component: ResetPasswordComponent,
     data: {
-      title: 'Changer mon mot de passe',
+      title: 'Change my password',
     },
   },
   {
@@ -280,6 +275,7 @@ const routes: Routes = [
     TopNavComponent,
     SideChatComponent,
     MsgTimePipe,
+    LocalDatePipe,
     DurationPipe,
     LinkifyPipe,
     ChatComponent,
@@ -298,6 +294,7 @@ const routes: Routes = [
     LanguageSelectorComponent,
     ConfirmationDialogComponent,
     ErrorDialogComponent,
+    ImageViewerDialogComponent,
     DotSpinnerComponent,
     DateTimePickerComponent,
     CustomPaginationComponent,
@@ -362,8 +359,8 @@ const routes: Routes = [
     DurationPipe,
     {
       provide: APP_INITIALIZER,
-      useFactory: (cs: ConfigService) => () => cs.getConfig(),
-      deps: [ConfigService],
+      useFactory: initDoctorTranslations,
+      deps: [TranslateService, ConfigService],
       multi: true,
     },
   ],

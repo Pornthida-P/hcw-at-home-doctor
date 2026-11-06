@@ -12,6 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   phoneNumberRegex,
   phoneOrEmailValidator,
+  normalizeThaiPhoneNumber,
 } from '../shared/validators/phone-number-validator';
 import { InviteService } from '../core/invite.service';
 import { TwilioWhatsappConfig } from '../../utils/twillo-whatsapp-config';
@@ -99,6 +100,32 @@ export class InviteExpertComponent implements OnInit {
 
   ngOnInit() {
     this.createFormGroup();
+    this.refreshExpertLink();
+  }
+
+  /**
+   * The link stored on the consultation is frozen at creation time
+   * (and is empty for consultations created without an invite). Ask the
+   * backend for the current expert link; keep the stored one as fallback.
+   */
+  refreshExpertLink() {
+    if (!this.data?.id) {
+      return;
+    }
+    this.consultationService.getExpertLink(this.data.id).subscribe({
+      next: res => {
+        if (res?.expertInvitationURL) {
+          this.data.expertLink = res.expertInvitationURL;
+          this.myForm?.get('link')?.setValue(res.expertInvitationURL);
+          if (this.data.consultation?.consultation) {
+            this.data.consultation.consultation.expertInvitationURL = res.expertInvitationURL;
+          }
+        }
+      },
+      error: err => {
+        console.warn('Could not refresh expert link', err);
+      },
+    });
   }
 
   onNoClick(): void {
@@ -126,7 +153,16 @@ export class InviteExpertComponent implements OnInit {
     }
   }
 
+  normalizeContact() {
+    const control = this.myForm.get('email');
+    const normalized = normalizeThaiPhoneNumber(control.value);
+    if (normalized !== control.value) {
+      control.setValue(normalized);
+    }
+  }
+
   onSubmit() {
+    this.normalizeContact();
     if (this.myForm.valid) {
       this.loading = true;
       const body = {

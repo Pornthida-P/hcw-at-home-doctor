@@ -20,6 +20,7 @@
             matInput
             [placeholder]="'inviteForm.emailOrSMS' | translate"
             formControlName="email"
+            (blur)="normalizeContact()"
             [errorStateMatcher]="matcher"
             required />
 
@@ -31,10 +32,7 @@
             {{ 'inviteForm.pleaseEnterValidEmailOrPhoneNumber' | translate }}
           </mat-error>
           <mat-error *ngIf="myForm.controls?.email.hasError('required')">
-            {{
-              'inviteForm.pleaseOnlyFillUpAnEmailOrAnMobilePhoneNumber'
-                | translate
-            }}
+            {{ 'inviteForm.pleaseEnterAnEmailOrMobileNumber' | translate }}
           </mat-error>
           <mat-error *ngIf="myForm.controls?.email.hasError('email')">
             {{ 'inviteForm.invalidEmailAddress' | translate }}
@@ -87,6 +85,9 @@
             (click)="copy()"
             [cdkCopyToClipboard]="data.expertLink"></mat-icon>
         </div>
+        <p class="expert-link-hint">
+          {{ 'consultations.expertLinkHint' | translate }}
+        </p>
 
         <button color="primary" mat-raised-button (click)="onNoClick()" type="button">
           {{ 'consultation.close' | translate }}

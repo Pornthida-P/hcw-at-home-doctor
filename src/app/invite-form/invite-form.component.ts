@@ -28,15 +28,18 @@ import {
 import {
   phoneNumberRegex,
   phoneOrEmailValidator,
+  normalizeThaiPhoneNumber,
 } from '../shared/validators/phone-number-validator';
 import { catchError, filter, switchMap } from 'rxjs/operators';
 import { InviteLinkComponent } from '../invite-link/invite-link.component';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { TwilioWhatsappConfig } from '../../utils/twillo-whatsapp-config';
 import { validateIf } from '../shared/validators/validate-if.validator';
 import { IStepOption, TourService } from 'ngx-ui-tour-md-menu';
 import { Direction, EventName, TourType } from '../models/tour';
 import { SidenavToggleService } from '../core/sidenav-toggle.service';
 import {DEFAULT_REQUIRED_FIELDS, MessageService} from "../contstants/invitations";
+import { APP_LANGUAGES } from '../i18n/i18n.module';
 
 interface DialogData {
   phoneNumber: string;
@@ -88,6 +91,11 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 export class InviteFormComponent implements OnDestroy, OnInit, OnDestroy {
   isPatientInvite = true;
   matcher = new MyErrorStateMatcher();
+  // only show errors once the user interacted with the field (not right after ticking a checkbox)
+  touchedMatcher: ErrorStateMatcher = {
+    isErrorState: (control: UntypedFormControl | null) =>
+      !!(control && control.invalid && (control.dirty || control.touched)),
+  };
   loading = false;
   createInviteSub: Subscription;
   error = '';
@@ -108,6 +116,7 @@ export class InviteFormComponent implements OnDestroy, OnInit, OnDestroy {
   showGuestRadioGroup = false;
   showGuestSuccessMessage = '';
   selectedTimezone = '';
+  wasSentManually = false;
 
   constructor(
     private fb: FormBuilder,
@@ -130,6 +139,13 @@ export class InviteFormComponent implements OnDestroy, OnInit, OnDestroy {
     }
     if (!this.data.phoneNumber) {
       this.data.phoneNumber = '';
+    }
+    if (this.edit) {
+      // restore the existing contact and delivery method when editing an invite
+      this.data.patientContact =
+        this.data.patientContact || this.data.emailAddress || this.data.phoneNumber || '';
+      this.wasSentManually =
+        this.data.messageService === '4' || (!this.data.emailAddress && !this.data.phoneNumber);
     }
     if (this.data.scheduledFor) {
       this.data.scheduledFor = new Date(this.data.scheduledFor);
@@ -183,7 +199,8 @@ export class InviteFormComponent implements OnDestroy, OnInit, OnDestroy {
         ? enabledFieldsRaw
         : DEFAULT_REQUIRED_FIELDS;
 
-    const queueFormControl = new UntypedFormControl(undefined);
+    const queueValidators = this.configService.config?.requireSharedQueue ? [Validators.required] : [];
+    const queueFormControl = new UntypedFormControl(undefined, queueValidators);
 
     this.myForm = this.formBuilder.group(
       {
@@ -221,7 +238,7 @@ export class InviteFormComponent implements OnDestroy, OnInit, OnDestroy {
                 : []
         ),
         languageFormControl: new UntypedFormControl(
-          'fr',
+          'en',
           this.isPatientInvite ? [Validators.required] : []
         ),
         dateTimeFormControl: new UntypedFormControl(''),
@@ -342,6 +359,10 @@ export class InviteFormComponent implements OnDestroy, OnInit, OnDestroy {
       this.sendInviteExperts();
       this.valueChangesGuestContactFormControl();
     });
+
+    if (this.isPatientInvite && this.edit && this.wasSentManually) {
+      this.myForm.get('sendLinkManually').setValue(true);
+    }
 
     this.handleValueChanges();
   }
@@ -624,7 +645,7 @@ export class InviteFormComponent implements OnDestroy, OnInit, OnDestroy {
     this.dialogRef.updateSize('50%', '50%');
     this.data.doctorLanguage = window.localStorage.getItem('hhw-lang');
 
-    if (this.data.patientContact || this.data.firstName) {
+    if (this.data.patientContact || this.data.firstName || (this.edit && this.wasSentManually)) {
       this.showPatientForm();
     }
     this.loading = true;
@@ -640,7 +661,7 @@ export class InviteFormComponent implements OnDestroy, OnInit, OnDestroy {
     this.translationOrganizationService.getLanguages().subscribe({
       next: res => {
         if (res?.length) {
-          this.languages = res.map(l => {
+          this.languages = res.filter(l => APP_LANGUAGES.includes(l)).map(l => {
             return {
               code: l,
               translated: this.translate.instant('inviteForm.' + l),
@@ -650,13 +671,15 @@ export class InviteFormComponent implements OnDestroy, OnInit, OnDestroy {
           const supportedLanguage = this.languages.find(
             i => i.code === browserLanguage
           );
-          if (this.data.language) {
+          if (this.data.language && APP_LANGUAGES.includes(this.data.language)) {
             return;
           }
-          if (this.configService.config?.defaultPatientLocale) {
+          if (APP_LANGUAGES.includes(this.configService.config?.defaultPatientLocale)) {
             this.data.language = this.configService.config.defaultPatientLocale;
           } else if (supportedLanguage) {
             this.data.language = supportedLanguage.code;
+          } else {
+            this.data.language = APP_LANGUAGES[0];
           }
         }
       },
@@ -714,7 +737,39 @@ export class InviteFormComponent implements OnDestroy, OnInit, OnDestroy {
     this.dialogRef.close();
   }
 
+  get isSwitchingFromManual(): boolean {
+    return (
+      this.isPatientInvite &&
+      this.edit &&
+      this.wasSentManually &&
+      !this.myForm?.get('sendLinkManually')?.value
+    );
+  }
+
+  normalizePhoneControl(control: AbstractControl, field?: string) {
+    if (!control) {
+      return;
+    }
+    const value = control.value;
+    const normalized = normalizeThaiPhoneNumber(value);
+    if (normalized !== value) {
+      if (field) {
+        this.data[field] = normalized;
+      }
+      control.setValue(normalized);
+    }
+  }
+
+  normalizeContactFields() {
+    this.normalizePhoneControl(this.myForm.get('patientContactFormControl'), 'patientContact');
+    this.normalizePhoneControl(this.myForm.get('guestContactFormControl'), 'guestContact');
+    this.expertsFormArray.controls.forEach(group => {
+      this.normalizePhoneControl(group.get('expertContact'));
+    });
+  }
+
   onSubmit() {
+    this.normalizeContactFields();
     if (!this.myForm.valid) {
       return;
     }
@@ -722,6 +777,34 @@ export class InviteFormComponent implements OnDestroy, OnInit, OnDestroy {
     if (this.loading) {
       return;
     }
+
+    if (this.isSwitchingFromManual) {
+      const confirmRef = this.dialog.open(ConfirmationDialogComponent, {
+        id: 'confirmation_dialog',
+        data: {
+          question: this.translate.instant('inviteForm.confirmSwitchFromManual'),
+          yesText: this.translate.instant('inviteForm.confirmSwitchFromManualYes'),
+          noText: this.translate.instant('inviteForm.confirmSwitchFromManualNo'),
+          title: this.translate.instant('inviteForm.confirmSwitchFromManualTitle'),
+        },
+        autoFocus: false,
+      });
+      confirmRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.submitInvite();
+        }
+      });
+      return;
+    }
+
+    this.submitInvite();
+  }
+
+  submitInvite() {
+    if (this.loading) {
+      return;
+    }
+    this.normalizeContactFields();
     this.loading = true;
     this.isSubmitted = true;
 
@@ -729,11 +812,25 @@ export class InviteFormComponent implements OnDestroy, OnInit, OnDestroy {
     const isPatientContactAnPhoneNumber = phoneNumberRegex.test(
       this.data.patientContact
     );
-    if (isPatientContactAnPhoneNumber) {
+    if (this.isPatientInvite && this.myForm.get('sendLinkManually').value) {
+      this.data.patientContact = '';
+      this.data.phoneNumber = '';
+      this.data.emailAddress = '';
+      this.data.messageService = MessageService.manual;
+    } else if (isPatientContactAnPhoneNumber) {
       this.data.phoneNumber = this.data.patientContact;
-      this.data.messageService = value.messageService;
+      this.data.emailAddress = '';
+      this.data.messageService =
+        value.messageService ||
+        (this.data.messageService === MessageService.whatsapp
+          ? MessageService.whatsapp
+          : MessageService.sms);
     } else {
-      this.data.emailAddress = this.data.patientContact;
+      this.data.emailAddress = this.data.patientContact || '';
+      this.data.phoneNumber = '';
+      this.data.messageService = this.data.emailAddress
+        ? MessageService.email
+        : this.data.messageService;
     }
 
     if (

@@ -2,15 +2,15 @@
   [title]="'profile.profile' | translate"
   [icon]="'stat'"></app-top-nav>
 
-<div class="cards-container">
+<div class="cards-container" *ngIf="currentUser">
   <mat-card class="card-left">
     <div class="desc">
       <h2 class="capitalize">
         {{ 'profile.profile' | translate }}
       </h2>
-      <dl *ngIf="currentUser">
+      <dl>
         <dt>{{ 'profile.name' | translate }}</dt>
-        <dd>{{ currentUser.firstName + ' ' + currentUser.lastName }}</dd>
+        <dd>{{ ((currentUser.firstName || '') + ' ' + (currentUser.lastName || '')).trim() || currentUser.email }}</dd>
 
         <ng-container *ngIf="currentUser.email">
           <dt>{{ 'profile.addressEmail' | translate }}</dt>

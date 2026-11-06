@@ -1,8 +1,8 @@
-import { Injectable, Injector } from '@angular/core'
-import { Observable, Subject } from 'rxjs'
-import { environment } from '../../environments/environment'
+import { Injectable, Injector } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-import { Router } from '@angular/router'
+import { Router } from '@angular/router';
 
 import { io, Socket } from 'socket.io-client';
 import { ConsultationService } from './consultation.service';
@@ -12,15 +12,22 @@ import { AuthService } from '../auth/auth.service';
   providedIn: 'root',
 })
 export class SocketEventsService {
-  socket: Socket | null = null
-  public initialized = false
-  private connection: Subject<String> = new Subject()
-  public consultationClosedSubj: Subject<any> = new Subject()
+  socket: Socket | null = null;
+  public initialized = false;
+  private connection: Subject<String> = new Subject();
+  public consultationClosedSubj: Subject<any> = new Subject();
   private user: any = null;
 
-  constructor(private router: Router, private injector: Injector) { }
+  constructor(
+    private router: Router,
+    private injector: Injector
+  ) {}
 
-  private socketGet(url: string, data: any, callback: (resData: any, jwres?: any) => void) {
+  private socketGet(
+    url: string,
+    data: any,
+    callback: (resData: any, jwres?: any) => void
+  ) {
     if (!this.socket || !this.socket.connected) {
       console.warn('Socket not connected, attempting callback with success');
       return callback({ success: true }, { statusCode: 200 });
@@ -31,9 +38,9 @@ export class SocketEventsService {
       url: url,
       data: data || {},
       headers: {
-        'Authorization': `Bearer ${this.user?.token || ''}`,
-        'id': this.user?.id?.toString() || ''
-      }
+        Authorization: `Bearer ${this.user?.token || ''}`,
+        id: this.user?.id?.toString() || '',
+      },
     };
 
     this.socket.emit('get', sailsMessage, (response: any) => {
@@ -47,9 +54,13 @@ export class SocketEventsService {
   }
 
   init(currentUser) {
-    console.info('initialize socket ', this.initialized)
-    if (this.initialized && this.user && this.user.token === currentUser.token) {
-      return
+    console.info('initialize socket ', this.initialized);
+    if (
+      this.initialized &&
+      this.user &&
+      this.user.token === currentUser.token
+    ) {
+      return;
     }
 
     this.user = currentUser;
@@ -60,271 +71,291 @@ export class SocketEventsService {
       reconnectionDelayMax: 5000,
       transports: ['websocket', 'polling'],
       forceNew: true,
-      path: '/socket.io',
+      path: environment.socketPath || '/socket.io',
       query: {
         token: currentUser.token,
         __sails_io_sdk_version: '1.2.1',
         __sails_io_sdk_platform: 'browser',
-        __sails_io_sdk_language: 'javascript'
+        __sails_io_sdk_language: 'javascript',
       },
       extraHeaders: {
         id: currentUser.id.toString(),
-        'Authorization': `Bearer ${currentUser.token}`,
-      }
+        Authorization: `Bearer ${currentUser.token}`,
+      },
     });
 
-    (window as any).socket = this.socket
+    (window as any).socket = this.socket;
 
     // window.socket
     this.socket.on(
       'connect',
       function socketConnected() {
-        this.connection.next('connect')
+        this.connection.next('connect');
 
         this.socketGet('/api/v1/subscribe-to-socket', {}, (resData, jwres) => {
-          console.info('res data subscribe-to-socket', resData, jwres)
-          this.initialized = true
-        })
+          console.info('res data subscribe-to-socket', resData, jwres);
+          this.initialized = true;
+        });
         this.socketGet('/api/v1/subscribe-to-doctors', {}, (resData, jwres) => {
-          console.info('res data subscribe-to-doctors', resData, jwres)
-        })
-      }.bind(this),
-    )
-    this.socket.on('error', (err) => {
-      this.connection.next('connect_failed')
-      console.info('Error connecting to server', err)
-    })
+          console.info('res data subscribe-to-doctors', resData, jwres);
+        });
+      }.bind(this)
+    );
+    this.socket.on('error', err => {
+      this.connection.next('connect_failed');
+      console.info('Error connecting to server', err);
+    });
 
     this.socket.on('disconnect', () => {
-      console.info('Disconnect from server')
-    })
+      console.info('Disconnect from server');
+    });
 
-    this.socket.on('reconnect', (number) => {
-      this.connection.next('connect')
-      console.info('Reconnected to server', number)
+    // In socket.io v4 the reconnection events are emitted by the Manager
+    // (this.socket.io), not by the Socket itself. Listening on this.socket
+    // would never fire these handlers.
+    this.socket.io.on('reconnect', number => {
+      this.connection.next('connect');
+      console.info('Reconnected to server', number);
       try {
-        const  consultationsService =  this.injector.get(ConsultationService);
+        const consultationsService = this.injector.get(ConsultationService);
         const pendingCount = consultationsService.consultationsOverview.filter(
-          (c) => c.consultation.status === "pending"
-        ).length
+          c => c.consultation.status === 'pending'
+        ).length;
 
-        consultationsService.loadConsultationOverview().subscribe(consultations=>{
-          const pendingCountAfterUpdate = consultations.filter(
-            (c) => c.consultation.status === "pending"
-          ).length
-          if(pendingCountAfterUpdate> pendingCount){
-            this.playAudio()
-          }
-        })
-
+        consultationsService
+          .loadConsultationOverview()
+          .subscribe(consultations => {
+            const pendingCountAfterUpdate = consultations.filter(
+              c => c.consultation.status === 'pending'
+            ).length;
+            if (pendingCountAfterUpdate > pendingCount) {
+              this.playAudio();
+            }
+          });
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
-    })
+    });
 
-    this.socket.on('reconnect_attempt', () => {
-      this.connection.next('connect_failed')
-      console.info('Reconnect Attempt')
-    })
-
-    this.socket.on('reconnecting', (number) => {
-      console.info('Reconnecting to server', number)
-      this.injector.get(AuthService).verifyRefreshToken().subscribe({
-        next: (res) => {}, error: (err) => {
-          if (err.status === 401) {
-            this.injector.get(AuthService).logout();
-          }
-        }
-      })
+    // 'reconnecting' no longer exists in v4; its logic now lives on the
+    // Manager's 'reconnect_attempt' event, which carries the attempt number.
+    this.socket.io.on('reconnect_attempt', number => {
+      console.info('Reconnect Attempt', number);
+      // Stay silent while the first attempt is in flight: a connection that
+      // recovers on the first try shows no message. Only once that attempt
+      // failed (we are now on attempt 2+) do we surface "Connexion échouée".
+      if (number > 1) {
+        this.connection.next('connect_failed');
+      }
+      this.injector
+        .get(AuthService)
+        .verifyRefreshToken()
+        .subscribe({
+          next: res => {
+            // Refresh the token carried in the handshake query so beforeConnect
+            // receives a valid JWT on the next reconnection attempt.
+            const fresh = this.injector.get(AuthService).currentUserValue;
+            if (fresh && this.socket?.io?.opts) {
+              (this.socket.io.opts.query as any) = {
+                ...(this.socket.io.opts.query as any),
+                token: fresh.token,
+              };
+              this.user = fresh;
+            }
+          },
+          error: err => {
+            if (err.status === 401) {
+              this.injector.get(AuthService).logout();
+            }
+          },
+        });
       if (number > 9) {
         this.injector.get(AuthService).logout();
       }
-    })
+    });
 
-    this.socket.on('reconnect_error', (err) => {
-      this.connection.next('connect_failed')
-      console.info('Reconnect Error', err)
-    })
+    // Per-attempt failures are not surfaced here; the message is driven by the
+    // attempt counter in 'reconnect_attempt' so a single failed attempt that
+    // immediately recovers stays silent.
+    this.socket.io.on('reconnect_error', err => {
+      console.info('Reconnect Error', err);
+    });
 
-    this.socket.on('reconnect_failed', () => {
-      this.connection.next('connect_failed')
-      console.info('Reconnect failed')
-    })
+    this.socket.io.on('reconnect_failed', () => {
+      this.connection.next('connect_failed');
+      console.info('Reconnect failed');
+    });
 
     this.socket.on('connect_error', () => {
-      this.connection.next('connect_failed')
-      console.info('connect_error')
-    })
+      console.info('connect_error');
+    });
   }
 
   updateConnectionStatus(status) {
-    this.connection.next(status)
+    this.connection.next(status);
   }
 
   connectionSub(): Subject<any> {
-    return this.connection
+    return this.connection;
   }
 
   onConsultation(): Subject<any> {
-    const sub = new Subject()
-    const obs = Observable.create((observer) => {
-      this.socket.on('newConsultation', (e) => {
-        console.info('new consultation', e)
-        this.playAudio()
-        observer.next(e)
-      })
-    })
-    obs.subscribe(sub)
-    return sub
+    const sub = new Subject();
+    const obs = Observable.create(observer => {
+      this.socket.on('newConsultation', e => {
+        console.info('new consultation', e);
+        this.playAudio();
+        observer.next(e);
+      });
+    });
+    obs.subscribe(sub);
+    return sub;
   }
 
   onConsultationClosed(): Subject<any> {
-
-    const sub = new Subject()
-    const obs = Observable.create((observer) => {
-      this.socket.on('consultationClosed', (e) => {
-        console.info('consultation closed ........', e)
-        observer.next(e)
-      })
-    })
-    obs.subscribe(sub)
-    return sub
+    const sub = new Subject();
+    const obs = Observable.create(observer => {
+      this.socket.on('consultationClosed', e => {
+        console.info('consultation closed ........', e);
+        observer.next(e);
+      });
+    });
+    obs.subscribe(sub);
+    return sub;
   }
 
   onOwnershipTransferred(): Subject<any> {
-    const sub = new Subject()
-    const obs = Observable.create((observer) => {
-      this.socket.on('ownershipTransferred', (e) => {
-        console.info('ownership transferred', e)
-        observer.next(e)
-      })
-    })
-    obs.subscribe(sub)
-    return sub
+    const sub = new Subject();
+    const obs = Observable.create(observer => {
+      this.socket.on('ownershipTransferred', e => {
+        console.info('ownership transferred', e);
+        observer.next(e);
+      });
+    });
+    obs.subscribe(sub);
+    return sub;
   }
 
   onMessage(): Subject<any> {
-    const sub = new Subject()
-    const obs = Observable.create((observer) => {
-      this.socket.on('newMessage', (e) => {
-        console.info('new mesg ', e)
-          if ((e.data.type === 'text' || e.data.type === 'attachment')) {
-              const audio = new Audio('assets/sounds/new-message.mp3');
-              audio.play().catch(err => console.log('Audio play failed:', err));
-          }
-        observer.next(e)
-      })
-    })
-    obs.subscribe(sub)
-    return sub
+    const sub = new Subject();
+    const obs = Observable.create(observer => {
+      this.socket.on('newMessage', e => {
+        console.info('new mesg ', e);
+        if (e.data.type === 'text' || e.data.type === 'attachment') {
+          const audio = new Audio('assets/sounds/new-message.mp3');
+          audio.play().catch(err => console.log('Audio play failed:', err));
+        }
+        observer.next(e);
+      });
+    });
+    obs.subscribe(sub);
+    return sub;
   }
 
   onOnlineStatusChange(): Subject<any> {
-    const sub = new Subject()
-    const obs = Observable.create((observer) => {
-      this.socket.on('onlineStatusChange', (e) => {
-        console.info('online status change')
-        console.info('e :: ', e)
-        observer.next(e)
-      })
-
-    })
-    obs.subscribe(sub)
-    return sub
+    const sub = new Subject();
+    const obs = Observable.create(observer => {
+      this.socket.on('onlineStatusChange', e => {
+        console.info('online status change');
+        console.info('e :: ', e);
+        observer.next(e);
+      });
+    });
+    obs.subscribe(sub);
+    return sub;
   }
 
   onCall(): Subject<any> {
-    const sub = new Subject()
-    const obs = Observable.create((observer) => {
-      this.socket.on('newCall', (e) => {
-        console.info('End call ', e)
-        observer.next(e)
-      })
-    })
-    obs.subscribe(sub)
-    return sub
+    const sub = new Subject();
+    const obs = Observable.create(observer => {
+      this.socket.on('newCall', e => {
+        console.info('End call ', e);
+        observer.next(e);
+      });
+    });
+    obs.subscribe(sub);
+    return sub;
   }
 
   onRejectCall(): Subject<any> {
-    const sub = new Subject()
-    const obs = Observable.create((observer) => {
-
-      this.socket.on('rejectCall', (e) => observer.next(e))
-    })
-    obs.subscribe(sub)
-    return sub
+    const sub = new Subject();
+    const obs = Observable.create(observer => {
+      this.socket.on('rejectCall', e => observer.next(e));
+    });
+    obs.subscribe(sub);
+    return sub;
   }
 
   onAcceptCall() {
-    const obs = Observable.create((observer) => {
-      this.socket.on('acceptCall', (e) => {
-        console.info('Accepted Call EVENT >>>>>>>>>>>>>>>>>>>>>>>>>>>>> ', e)
-        observer.next(e)
-      })
-    })
+    const obs = Observable.create(observer => {
+      this.socket.on('acceptCall', e => {
+        console.info('Accepted Call EVENT >>>>>>>>>>>>>>>>>>>>>>>>>>>>> ', e);
+        observer.next(e);
+      });
+    });
 
-    return obs
+    return obs;
   }
 
   onConsultationAccepted() {
-    const obs = Observable.create((observer) => {
-      this.socket.on('consultationAccepted', (e) => {
-        console.info('consultation accepted')
-        observer.next(e)
-      })
-    })
+    const obs = Observable.create(observer => {
+      this.socket.on('consultationAccepted', e => {
+        console.info('consultation accepted');
+        observer.next(e);
+      });
+    });
 
-    return obs
+    return obs;
   }
 
   onConsultationCanceled() {
-    const obs = Observable.create((observer) => {
-      this.socket.on('consultationCanceled', (e) => {
-        console.info('consultation canceled')
-        observer.next(e)
-      })
-    })
+    const obs = Observable.create(observer => {
+      this.socket.on('consultationCanceled', e => {
+        console.info('consultation canceled');
+        observer.next(e);
+      });
+    });
 
-    return obs
+    return obs;
   }
 
   onEndCall(): Subject<any> {
-    const sub = new Subject()
-    const obs = Observable.create((observer) => {
-      console.info('end call event')
-      this.socket.on('endCall', (e) => {
-        console.info('new call ', e)
-        observer.next(e)
-      })
-    })
-    obs.subscribe(sub)
-    return sub
+    const sub = new Subject();
+    const obs = Observable.create(observer => {
+      console.info('end call event');
+      this.socket.on('endCall', e => {
+        console.info('new call ', e);
+        observer.next(e);
+      });
+    });
+    obs.subscribe(sub);
+    return sub;
   }
 
   onConsultationUpdated(): Subject<any> {
-    const sub = new Subject()
-    const obs = Observable.create((observer) => {
-      this.socket.on('consultationUpdated', (e) => {
-        console.info('a consultation have been updated', e)
+    const sub = new Subject();
+    const obs = Observable.create(observer => {
+      this.socket.on('consultationUpdated', e => {
+        console.info('a consultation have been updated', e);
 
-        observer.next(e)
-      })
-    })
-    obs.subscribe(sub)
-    return sub
+        observer.next(e);
+      });
+    });
+    obs.subscribe(sub);
+    return sub;
   }
 
   playAudio() {
-    const audio = new Audio()
-    audio.src = '../assets/sounds/notification.mp3'
-    audio.load()
-    audio.play()
+    const audio = new Audio();
+    audio.src = 'assets/sounds/notification.mp3';
+    audio.load();
+    audio.play();
   }
 
   disconnect() {
     if (!this.socket || !this.socket.connected) {
-      return
+      return;
     }
-    return this.socket.disconnect()
+    return this.socket.disconnect();
   }
 }

@@ -6,10 +6,9 @@
   <app-overlay
     (close)="chatOpen = false"
     *ngIf="chatOpen"
-    [consultation]="currentConsultation">
-  </app-overlay>
+    [consultation]="currentConsultation"></app-overlay>
   <div class="cards-container">
-    <mat-card  class="card-left">
+    <mat-card class="card-left">
       <div class="desc">
         <h2>
           {{ 'dashboard.waitingRoom' | translate }}
@@ -42,16 +41,20 @@
       <table *ngIf="pendingConsultations.length" class="pending-consultations">
         <tr *ngFor="let pc of pendingConsultations" (click)="showChat(pc._id)">
           <td>
-            <span class="tile-header">{{
-              'dashboard.patient' | translate
-            }}</span>
+            <span class="tile-header">
+              {{ 'dashboard.patient' | translate }}
+            </span>
             {{ pc.consultation.firstName + ' ' + pc.consultation.lastName }}
           </td>
           <td>
-            <span class="tile-header">{{
-              'dashboard.message' | translate
-            }}</span>
-            {{ pc.lastMsg ? pc.lastMsg.text : 'Nouvelle consultation' }}
+            <span class="tile-header">
+              {{ 'dashboard.message' | translate }}
+            </span>
+            {{
+              pc.lastMsg
+                ? pc.lastMsg.text
+                : ('consultations.newConsultation' | translate)
+            }}
           </td>
           <td>
             <span class="tile-header">{{ 'dashboard.time' | translate }}</span>
@@ -98,9 +101,9 @@
       <table *ngIf="activeConsultations.length" class="active-consultations">
         <tr *ngFor="let ac of activeConsultations" (click)="showChat(ac._id)">
           <td>
-            <span class="tile-header">{{
-              'dashboard.patient' | translate
-            }}</span>
+            <span class="tile-header">
+              {{ 'dashboard.patient' | translate }}
+            </span>
             {{ ac.consultation.firstName + ' ' + ac.consultation.lastName }}
           </td>
           <td>

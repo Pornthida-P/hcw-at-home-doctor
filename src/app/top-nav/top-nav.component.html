@@ -1,11 +1,5 @@
 <div class="header">
-  <div
-    class="menu"
-    role="button"
-    tabindex="0"
-    (click)="toggleSidenav()"
-    (keydown.enter)="toggleSidenav()"
-    (keydown.space)="$event.preventDefault(); toggleSidenav()">
+  <div class="menu" (click)="toggleSidenav()">
     <svg
       width="24px"
       height="24px"
@@ -33,11 +27,7 @@
   <div class="header-items">
     <div
       class="new-consultation"
-      role="button"
-      tabindex="0"
       (click)="openNurse()"
-      (keydown.enter)="openNurse()"
-      (keydown.space)="$event.preventDefault(); openNurse()"
       *ngIf="configService?.config?.doctorExternalLink">
       <span>{{ 'topNav.new_consultation_form' | translate }}</span>
       <mat-icon svgIcon="in-new-tab"></mat-icon>
@@ -61,18 +51,10 @@
       <span class="help-button-text">{{ 'topNav.help' | translate }}</span>
     </button>
 
-    <div
-      class="user-wrapper"
-      role="button"
-      tabindex="0"
-      (click)="toggleLogout()"
-      (keydown.enter)="toggleLogout()"
-      (keydown.space)="$event.preventDefault(); toggleLogout()">
+    <div class="user-wrapper" (click)="toggleLogout()">
       <div [ngClass]="{ 'doc-btn': logoutToggle }" id="user">
         <mat-icon svgIcon="stat"></mat-icon>
-        {{
-          (currentUser?.firstName || '') + ' ' + (currentUser?.lastName || '')
-        }}
+        {{ ((currentUser.firstName || '') + ' ' + (currentUser.lastName || '')).trim() || currentUser.email }}
         <div class="items" *ngIf="logoutToggle">
           <div
             tourAnchor="{{ TourType.HEADER_PROFILE_MENU }}"
@@ -82,21 +64,11 @@
           </div>
           <div
             *ngIf="configService.config?.method === 'openid'"
-            role="button"
-            tabindex="0"
-            (click)="switchUser()"
-            (keydown.enter)="switchUser()"
-            (keydown.space)="$event.preventDefault(); switchUser()">
+            (click)="switchUser()">
             <mat-icon>switch_account</mat-icon>
             {{ 'topNav.switchUser' | translate }}
           </div>
-          <div
-            class="logout"
-            role="button"
-            tabindex="0"
-            (click)="logout()"
-            (keydown.enter)="logout()"
-            (keydown.space)="$event.preventDefault(); logout()">
+          <div class="logout" (click)="logout()">
             <mat-icon svgIcon="logout"></mat-icon>
             {{ 'topNav.logout' | translate }}
           </div>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import {of, Subject} from "rxjs";
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import {Observable, of, Subject} from "rxjs";
 import { environment } from '../../environments/environment';
 import {catchError, map, tap} from "rxjs/operators";
 import {Title} from "@angular/platform-browser";
@@ -63,18 +63,50 @@ export class ConfigService {
   }
 
   checkMarkdownExists(markdownUrl: string) {
-    return this.http.get(markdownUrl, { responseType: 'text' });
+    return this.http.get(markdownUrl, { responseType: 'text', observe: 'response' }).pipe(
+      map((res: HttpResponse<string>) => {
+        if (!ConfigService.isValidTermsResponse(res)) {
+          throw new Error('markdown-not-found');
+        }
+        return res.body as string;
+      })
+    );
   }
 
   getCountries() {
     return this.http.get<string[]>('assets/terms/countries.json');
   }
 
-  checkTermsFileExists(fileName: string) {
-    return this.http.get(`assets/terms/${fileName}`, { responseType: 'text' }).pipe(
-        map(() => true),
-        catchError(() => of(false))
+  /**
+   * Load a terms markdown file and return its content, or
+   * null when it is not available. When the file is missing, the web server's
+   * SPA fallback (try_files ... /index.html) answers HTTP 200 with index.html,
+   * which used to be treated as "file exists" and rendered as raw HTML text.
+   */
+  loadTermsFile(path: string): Observable<string | null> {
+    return this.http.get(path, { responseType: 'text', observe: 'response' }).pipe(
+      map((res: HttpResponse<string>) => (ConfigService.isValidTermsResponse(res) ? res.body : null)),
+      catchError(() => of(null))
     );
+  }
+
+  static isValidTermsResponse(res: HttpResponse<string>): boolean {
+    if (!res || res.status !== 200 || typeof res.body !== 'string') {
+      return false;
+    }
+    const contentType = (res.headers && res.headers.get('content-type')) || '';
+    if (contentType.toLowerCase().includes('text/html')) {
+      return false;
+    }
+    const head = res.body.trim().slice(0, 200).toLowerCase();
+    if (!head) {
+      return false;
+    }
+    return !(head.startsWith('<!doctype') || head.startsWith('<html') || head.includes('<app-root') || head.includes('<base href'));
+  }
+
+  checkTermsFileExists(fileName: string) {
+    return this.loadTermsFile(`assets/terms/${fileName}`).pipe(map(content => !!content));
   }
 
 }

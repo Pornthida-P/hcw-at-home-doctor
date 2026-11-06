@@ -143,13 +143,19 @@
         <div class="left">
           <p>{{ 'consultation.microSelection' | translate }}</p>
 
+          <p
+            class="device-name"
+            *ngIf="audioDevices.length === 1">
+            {{ audioDevices[0].label || 'device 1' }}
+          </p>
+
           <mat-form-field
             class="device--select"
-            *ngIf="audioDevices.length > 0">
+            *ngIf="audioDevices.length > 1">
             <mat-select
-              [required]="audioDevices.length > 1"
+              [required]="true"
               [(ngModel)]="audioDeviceId"
-              [disabled]="audioDevices.length < 2">
+              [attr.aria-label]="'consultation.microSelection' | translate">
               <mat-option
                 *ngFor="let device of audioDevices; let i = index"
                 [value]="device.deviceId">
@@ -157,6 +163,10 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
+
+          <p class="no-device" *ngIf="audioDevices.length === 0">
+            {{ 'consultation.noMicrophoneFound' | translate }}
+          </p>
 
           <div id="volume-container">
             <div id="volume-slider" [style.width.%]="100 - volumeLevel"></div>
@@ -166,13 +176,19 @@
         <div class="right">
           <p>{{ 'consultation.cameraSelection' | translate }}</p>
 
+          <p
+            class="device-name"
+            *ngIf="videoDevices.length === 1">
+            {{ videoDevices[0].label || 'device 1' }}
+          </p>
+
           <mat-form-field
             class="device--select"
-            *ngIf="videoDevices.length > 0">
+            *ngIf="videoDevices.length > 1">
             <mat-select
-              [required]="videoDevices.length > 1"
+              [required]="true"
               [(ngModel)]="videoDeviceId"
-              [disabled]="videoDevices.length < 2">
+              [attr.aria-label]="'consultation.cameraSelection' | translate">
               <mat-option
                 *ngFor="let device of videoDevices; let i = index"
                 [value]="device.deviceId">
@@ -180,6 +196,9 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
+          <p class="no-device" *ngIf="videoDevices.length === 0">
+            {{ 'consultation.noCameraFound' | translate }}
+          </p>
         </div>
       </div>
 

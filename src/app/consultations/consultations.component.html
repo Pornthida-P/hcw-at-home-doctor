@@ -130,8 +130,9 @@
               {{ 'consultations.startDateTime' | translate }}
             </span>
             {{
-              consultation.consultation.createdAt
-                | date: 'd MMM yyyy HH:mm' : 'fr'
+              (consultation.consultation.acceptedAt ||
+                consultation.consultation.createdAt)
+                | localDate: 'd MMM yyyy HH:mm'
             }}
           </td>
           <td *ngIf="status !== 'closed'">
@@ -150,8 +151,9 @@
               {{ 'consultations.duration' | translate }}
             </span>
             {{
-              consultation.consultation.createdAt -
-                consultation.consultation.closedAt | duration
+              consultation.consultation.closedAt -
+                (consultation.consultation.acceptedAt ||
+                  consultation.consultation.createdAt) | duration
             }}
           </td>
           <td *ngIf="status === 'closed'" class="hidden-mobile">

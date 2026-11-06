@@ -4,7 +4,6 @@ export class User {
   password: string;
   firstName: string;
   lastName: string;
-  role?: string;
   token?: string;
   phoneNumber: string;
   refreshToken: string;
