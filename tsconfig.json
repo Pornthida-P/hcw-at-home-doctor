@@ -25,7 +25,8 @@
       "dom"
     ],
     "esModuleInterop": true,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "skipLibCheck": true
   },
   "angularCompilerOptions":{
     "enableIvy":true

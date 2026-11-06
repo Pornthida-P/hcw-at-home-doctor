@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { of, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { ResetPasswordComponent } from './reset-password.component';
 import { AuthService } from '../auth/auth.service';
 import { ConfigService } from '../core/config.service';
@@ -214,10 +214,16 @@ describe('ResetPasswordComponent', () => {
       expect(component.error).toBe('network-error');
     });
 
-    it('should prevent duplicate submission while loading', async () => {
-      authService.resetPassword.and.returnValue(
-        new Promise(resolve => setTimeout(() => resolve({ success: true }), 100))
-      );
+    it('should prevent duplicate submission while loading', () => {
+      let resolver: any;
+      const delayedObservable = new Observable(subscriber => {
+        resolver = () => {
+          subscriber.next({ success: true });
+          subscriber.complete();
+        };
+      });
+      
+      authService.resetPassword.and.returnValue(delayedObservable);
       component.resetPasswordForm.patchValue({
         password: 'Pass123',
         confirmPassword: 'Pass123'
@@ -231,6 +237,8 @@ describe('ResetPasswordComponent', () => {
       const callCount2 = authService.resetPassword.calls.count();
 
       expect(callCount1).toBe(callCount2);
+      
+      if (resolver) resolver();
     });
   });
 
