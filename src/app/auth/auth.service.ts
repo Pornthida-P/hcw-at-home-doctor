@@ -178,6 +178,14 @@ export class AuthService {
     );
   }
 
+  activateAccount(token, password) {
+    return this.http.post<any>(
+      `${environment.api}/activate-account`,
+      { password, token },
+      {}
+    );
+  }
+
   loginSms(smsVerificationCode: string, user: string) {
     return this.http.post<any>(`${environment.api}/login-sms`, {
       smsVerificationCode,
