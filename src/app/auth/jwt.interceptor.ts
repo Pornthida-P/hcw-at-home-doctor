@@ -63,10 +63,6 @@ export class JwtInterceptor implements HttpInterceptor {
                     this.refreshTokenSubject.next(tokens.token);
 
                     const user = this.authService.currentUserValue;
-                    if (!user) {
-                        this.authService.logout(true);
-                        return throwError(() => new Error('No current user after refresh'));
-                    }
                     user.token = tokens.token;
                     user.refreshToken = tokens.refreshToken;
                     localStorage.setItem('currentUser', JSON.stringify(user));
@@ -78,10 +74,12 @@ export class JwtInterceptor implements HttpInterceptor {
 
                     return next.handle(this.addAuthenticationToken(request, tokens.token));
                 }),
-                catchError((refreshError: any) => {
+                catchError((refreshError: HttpErrorResponse) => {
                     this.isRefreshing = false;
                     this.refreshTokenSubject.error(refreshError);
-                    this.authService.logout(true);
+                    if (refreshError.status === 401) {
+                        this.authService.logout();
+                    }
                     return throwError(refreshError);
                 })
             );

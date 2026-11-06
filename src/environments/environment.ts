@@ -9,6 +9,7 @@ export const environment = {
 
   api: 'http://localhost:1337/api/v1',
   host: 'http://localhost:1337/',
+  socketPath: '/socket.io',
 
   //   api: 'http://192.168.1.9:1337/api/v1',
   // host: 'http://192.168.1.9:1337/',

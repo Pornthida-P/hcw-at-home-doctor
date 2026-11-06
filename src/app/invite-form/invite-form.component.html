@@ -58,7 +58,7 @@
             @if (isFieldEnabled('firstName')) {
               <mat-form-field>
                 <mat-label class="label">
-                  {{ 'inviteForm.firstName' | translate }}
+                  {{ 'inviteForm.firstName' | translate }} *
                 </mat-label>
                 <input
                   [(ngModel)]="data.firstName"
@@ -79,7 +79,7 @@
             @if (isFieldEnabled('lastName')) {
               <mat-form-field>
                 <mat-label class="label">
-                  {{ 'inviteForm.lastName' | translate }}
+                  {{ 'inviteForm.lastName' | translate }} *
                 </mat-label>
                 <input
                   [(ngModel)]="data.lastName"
@@ -103,7 +103,7 @@
             @if (isFieldEnabled('gender')) {
               <mat-form-field>
                 <mat-label class="label">
-                  {{ 'inviteForm.sex' | translate }}
+                  {{ 'inviteForm.sex' | translate }} *
                 </mat-label>
                 <mat-select
                   formControlName="genderFormControl"
@@ -188,6 +188,9 @@
                   </mat-option>
                 </span>
               </mat-select>
+              <mat-error *ngIf="myForm.controls.queueFormControl.hasError('required')">
+                {{ 'inviteForm.required' | translate }}
+              </mat-error>
             </mat-form-field>
           </div>
 
@@ -205,9 +208,11 @@
                 <input
                   [(ngModel)]="data.patientContact"
                   matInput
-                  placeholder="+6679..."
+                  placeholder="+668..."
+                  [required]="!myForm.get('sendLinkManually')?.value"
                   formControlName="patientContactFormControl"
                   name="patientContact"
+                  (blur)="normalizePhoneControl(myForm.get('patientContactFormControl'), 'patientContact')"
                   (ngModelChange)="changeTel()" />
 
                 <mat-hint class="success-message" *ngIf="showSuccessMessage">
@@ -230,7 +235,7 @@
                     )
                   ">
                   {{
-                    'inviteForm.pleaseOnlyFillUpAnEmailOrAnMobilePhoneNumber'
+                    'inviteForm.pleaseEnterAnEmailOrMobileNumber'
                       | translate
                   }}
                 </mat-error>
@@ -278,6 +283,9 @@
                 }}">
                 {{ 'inviteForm.sendLinkManually' | translate }}
               </mat-checkbox>
+              <mat-error *ngIf="isSwitchingFromManual">
+                {{ 'inviteForm.switchFromManualNotice' | translate }}
+              </mat-error>
             </div>
           </ng-container>
 
@@ -327,6 +335,7 @@
               formControlName="inviteGuestFormControl"
               [(ngModel)]="inviteGuest"
               (ngModelChange)="
+                myForm.get('guestContactFormControl')?.markAsUntouched();
                 myForm.get('guestContactFormControl')?.updateValueAndValidity()
               ">
               {{ 'inviteForm.inviteLovedOneOrProfessional' | translate }}
@@ -342,7 +351,8 @@
                 matInput
                 [placeholder]="'inviteForm.emailOrSMS' | translate"
                 formControlName="guestContactFormControl"
-                [errorStateMatcher]="matcher" />
+                (blur)="normalizePhoneControl(myForm.get('guestContactFormControl'), 'guestContact')"
+                [errorStateMatcher]="touchedMatcher" />
 
               <mat-hint class="success-message" *ngIf="showGuestSuccessMessage">
                 {{ showGuestSuccessMessage }}
@@ -362,7 +372,7 @@
                   myForm.controls?.guestContactFormControl.hasError('required')
                 ">
                 {{
-                  'inviteForm.pleaseOnlyFillUpAnEmailOrAnMobilePhoneNumber'
+                  'inviteForm.pleaseEnterAnEmailOrMobileNumber'
                     | translate
                 }}
               </mat-error>
@@ -425,6 +435,7 @@
                         <input
                           matInput
                           formControlName="expertContact"
+                          (blur)="normalizePhoneControl(expertControl.get('expertContact'))"
                           [placeholder]="'inviteForm.emailOrSMS' | translate" />
                         <mat-hint
                           class="success-message"
@@ -467,7 +478,7 @@
                             )
                           ">
                           {{
-                            'inviteForm.pleaseOnlyFillUpAnEmailOrAnMobilePhoneNumber'
+                            'inviteForm.pleaseEnterAnEmailOrMobileNumber'
                               | translate
                           }}
                         </mat-error>

@@ -20,6 +20,10 @@ import {StartTourComponent} from "../shared/components/start-tour/start-tour.com
 import {MatDialog} from "@angular/material/dialog";
 import {TranslateService} from "@ngx-translate/core";
 import {InviteFormComponent} from "../invite-form/invite-form.component";
+import {GuidedTourService} from "../core/guided-tour.service";
+
+// page the user was on when starting the guided tour, so the tour can bring them back
+const TOUR_RETURN_URL_KEY = 'hcw-tour-return-url';
 
 @Component({
   selector: 'app-top-nav',
@@ -36,6 +40,8 @@ export class TopNavComponent implements OnInit, OnDestroy {
   @Output() closeCon = new EventEmitter<boolean>();
   isMobile = false;
   private stepHideSubscription: Subscription;
+  // profile drop-down opened by the tour (closed again when a page-only tour ends)
+  private profileMenuOpenedByTour = false;
 
   constructor(
     private zone: NgZone,
@@ -43,6 +49,7 @@ export class TopNavComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private authService: AuthService,
     private tourService: TourService,
+    private guidedTourService: GuidedTourService,
     public configService: ConfigService,
     private translate: TranslateService,
     private breakpointObserver: BreakpointObserver,
@@ -69,6 +76,26 @@ export class TopNavComponent implements OnInit, OnDestroy {
   listenToTourSubscriptions() {
     this.stepHideSubscription = this.tourService.events$.subscribe(events => {
       const value = events.value as { step: IStepOption; direction: Direction };
+      const pageTour = this.guidedTourService.mode === 'page';
+      if (events.name === 'end') {
+        if (pageTour) {
+          // Page-only tour never navigated; just tidy up the profile menu
+          sessionStorage.removeItem(TOUR_RETURN_URL_KEY);
+          if (this.profileMenuOpenedByTour && this.logoutToggle) {
+            this.toggleLogout();
+          }
+          this.profileMenuOpenedByTour = false;
+        } else {
+          // full tour closed before its last step: go back to where the user started it
+          const returnUrl = sessionStorage.getItem(TOUR_RETURN_URL_KEY);
+          if (returnUrl) {
+            sessionStorage.removeItem(TOUR_RETURN_URL_KEY);
+            if (returnUrl !== this.router.url) {
+              this.router.navigateByUrl(returnUrl);
+            }
+          }
+        }
+      }
       if (
           events.name === EventName.StepHide &&
           value &&
@@ -76,7 +103,10 @@ export class TopNavComponent implements OnInit, OnDestroy {
           value.step.anchorId === TourType.CONSULTATION_HISTORY_MENU &&
           value.direction === Direction.Forwards
       ) {
-        this.toggleLogout();
+        if (!this.logoutToggle) {
+          this.profileMenuOpenedByTour = true;
+          this.toggleLogout();
+        }
       }
       if (
           events.name === EventName.StepShow &&
@@ -102,7 +132,8 @@ export class TopNavComponent implements OnInit, OnDestroy {
           value &&
           value.step &&
           value.step.anchorId === TourType.WAITING_ROOM_MENU &&
-          value.direction === Direction.Backwards
+          value.direction === Direction.Backwards &&
+          !pageTour
       ) {
         this.openInviteDialog()
       }
@@ -121,9 +152,30 @@ export class TopNavComponent implements OnInit, OnDestroy {
           value &&
           value.step &&
           value.step.anchorId === TourType.HEADER_PROFILE_MENU &&
+          value.direction === Direction.Forwards &&
+          pageTour
+      ) {
+        // End of the page-only tour: stay on this page and offer the full tour
+        sessionStorage.removeItem(TOUR_RETURN_URL_KEY);
+        if (this.profileMenuOpenedByTour && this.logoutToggle) {
+          this.toggleLogout();
+        }
+        this.profileMenuOpenedByTour = false;
+        this.offerFullTour();
+      } else if (
+          events.name === EventName.StepHide &&
+          value &&
+          value.step &&
+          value.step.anchorId === TourType.HEADER_PROFILE_MENU &&
           value.direction === Direction.Forwards
       ) {
-        this.router.navigate([`/profile`]);
+        const returnUrl = sessionStorage.getItem(TOUR_RETURN_URL_KEY);
+        sessionStorage.removeItem(TOUR_RETURN_URL_KEY);
+        if (returnUrl) {
+          this.router.navigateByUrl(returnUrl);
+        } else {
+          this.router.navigate([`/profile`]);
+        }
          this.dialog.open(StartTourComponent, {
           autoFocus: false,
            data: {
@@ -150,9 +202,39 @@ export class TopNavComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Help button: run a tour of the current page without navigating
+   * away. The full onboarding tour (which visits Invitations, waiting room,
+   * ... and brings the user back here at the end) is offered afterwards.
+   */
   startTour() {
+    if (this.guidedTourService.isRunning()) {
+      return;
+    }
+    sessionStorage.setItem(TOUR_RETURN_URL_KEY, this.router.url);
     this.sidenavToggleService.toggleSidenav('open');
-    this.tourService.start();
+    this.guidedTourService.startPageTour();
+  }
+
+  private offerFullTour() {
+    const dialogRef = this.dialog.open(StartTourComponent, {
+      autoFocus: false,
+      width: '450px',
+      data: {
+        title: this.translate.instant('tour.pageTourEndTitle'),
+        description: this.translate.instant('tour.pageTourEndDescription'),
+        dismissBtnTitle: this.translate.instant('tour.pageTourCloseBtnTitle'),
+        submitBtnTitle: this.translate.instant('tour.pageTourFullTourBtnTitle'),
+      },
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // remember where we are so the full tour brings the user back here
+        sessionStorage.setItem(TOUR_RETURN_URL_KEY, this.router.url);
+        this.sidenavToggleService.toggleSidenav('open');
+        this.guidedTourService.startFullTour();
+      }
+    });
   }
 
   toggleSidenav() {

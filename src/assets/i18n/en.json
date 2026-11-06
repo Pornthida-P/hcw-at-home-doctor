@@ -14,7 +14,8 @@
     "verificationCode": "Verification code",
     "send": "Send",
     "sendCodeAgain": "Send code again",
-    "youReachedTheMaximumAttemptAmount": "You reached the maximum attempt amount"
+    "youReachedTheMaximumAttemptAmount": "You reached the maximum attempt amount",
+    "roleNotAllowed": "This account is not allowed to use the doctor application."
   },
   "app": {
     "dashboard": "Dashboard",
@@ -26,7 +27,8 @@
     "support": "Support",
     "refresh": "Refresh",
     "reconnected": "You are reconnected",
-    "connectionFailed": "The connection to the server is not functioning properly, and you can no longer receive consultation requests. If the issue persists, please refresh your page."
+    "connectionFailed": "The connection to the server is not functioning properly, and you can no longer receive consultation requests. If the issue persists, please refresh your page.",
+    "loading": "Loading…"
   },
   "filter": {
     "filtersApplied": "Filters applied:",
@@ -58,14 +60,14 @@
     "duration": "Duration",
     "textMessagesOnlySentToPatientWarning": "In the case of a teleconsultation with a patient, the messages and attachments sent here are only visible to the patient for confidentiality reasons",
     "yourBrowserDoesNotSupportTheAudioElement": "Your browser does not support the audio element.",
-    "videoCallAccepted": "Video call accepted",
+    "videoCallAccepted": "Video call started",
     "videoCallMissed": "Video call missed",
     "videoCall": "Video call",
-    "videoCallFinished": "Video call finished",
-    "videoAudioAccepted": "Video audio accepted",
-    "videoAudioMissed": "Video audio missed",
-    "videoAudioRequested": "Video audio requested",
-    "videoAudioFinished": "Video audio finished",
+    "videoCallFinished": "Video call ended",
+    "videoAudioAccepted": "Audio call started",
+    "videoAudioMissed": "Audio call missed",
+    "videoAudioRequested": "Audio call requested",
+    "videoAudioFinished": "Audio call ended",
     "IMADTeam": "IMADTeam",
     "joinVideoCall": "Join video",
     "inviteExpert": "Invite a colleague",
@@ -86,7 +88,15 @@
     "transferOwnershipConfirm": "Yes, take ownership",
     "transferOwnershipCancel": "Cancel",
     "transferOwnershipSuccess": "Ownership transferred successfully",
-    "transferOwnershipError": "Failed to transfer ownership"
+    "transferOwnershipError": "Failed to transfer ownership",
+    "image": "Image",
+    "downloadImage": "Download",
+    "downloadFailed": "Download failed. Please try again.",
+    "close": "Close",
+    "typeYourMessage": "Type your message",
+    "imageLoading": "Loading image...",
+    "imageLoadFailed": "Unable to load image",
+    "retryImage": "Retry"
   },
   "consultations": {
     "noPatientName": "Undefined",
@@ -94,7 +104,7 @@
     "patient": "Patient",
     "waitingQueue": "Waiting queue",
     "message": "Message",
-    "attachement": "Attachement",
+    "attachement": "Attachment",
     "newConsultation": "New consultation",
     "startDateTime": "Start date/time",
     "time": "Time",
@@ -112,11 +122,13 @@
     "inviteExpert": "Invite a colleague",
     "share": "Share invite by Email or mobile phone",
     "shareBy": "Share invite by link",
+    "expertLinkHint": "Your colleague opens this link in the participant (patient) web app, enters their name and joins this consultation as an expert. It is a dedicated expert link, different from the patient's invite link.",
     "requestedBy": "Requested by",
     "filters": "Filters",
     "exportButton": "Export",
     "handledBy": "Handled by",
-    "closedBy": "Closed by"
+    "closedBy": "Closed by",
+    "offline": "Offline"
   },
   "consultation": {
     "start": "START",
@@ -130,12 +142,15 @@
     "microAndCameraConfiguration": "Micro and camera configuration",
     "microSelection": "Micro selection",
     "cameraSelection": "Camera selection",
+    "noCameraFound": "No camera found. Connect a camera and allow the browser to use it.",
+    "noMicrophoneFound": "No microphone found. Connect a microphone and allow the browser to use it.",
     "close": "Close",
     "callError": "Unable to initiate call, server returned",
+    "videoServerUnavailable": "The video server is not available. Please try again later or contact your administrator.",
     "selfCallNotAllowed": "Cannot make a call: You are assigned as both doctor and requester in this consultation. Please assign a different user to one of the roles.",
     "patientNotJoined": "Cannot initiate call: the patient has not joined the consultation yet.",
     "expert_link": "Expert Link",
-    "cameraNotAccessible": "Your camera is not accessible. Do you want to continue without video call without your camera?",
+    "cameraNotAccessible": "Your camera is not accessible. Do you want to continue the video call without your camera?",
     "continueWithoutCamera": "Continue without camera",
     "reschedule": "Reschedule call",
     "rescheduleTitle": "Reschedule Consultation",
@@ -157,7 +172,7 @@
   "dashboard": {
     "dashboard": "Dashboard",
     "waitingRoom": "WAITING ROOM",
-    "consultationsListInAwaitingTreatment": "Consultations list in awaiting treatment",
+    "consultationsListInAwaitingTreatment": "List of consultations awaiting treatment",
     "startNextConsultation": "Start next consultation",
     "noConsultation": "No consultation",
     "patient": "Patient",
@@ -166,7 +181,8 @@
     "displayTheList": "Display the list",
     "openedConsultations": "OPENED CONSULTATIONS",
     "consultationsListAwaitingToBeClosedOrCompleted": "Consultations list awaiting to be closed or completed",
-    "sendNewInvite": "Send new invite"
+    "sendNewInvite": "Send new invite",
+    "yesterday": "Yesterday"
   },
   "footer": {
     "supportedByThePrivateFoundation": "Supported by the private foundation"
@@ -187,16 +203,22 @@
   "forgotPassword": {
     "home": "HOME",
     "youForgotYourPassword": "You forgot your password:",
-    "fillUpYourEmailAddressBellow": "Fill up your email address bellow and when will send you a link to update your password.",
+    "fillUpYourEmailAddressBellow": "Fill in your email address below and we will send you a link to update your password.",
     "ifTheEmailProvidedExistsInOurDatabase": "If the email provided exists in our database, you will receive a message containing a link in order to update your password.",
     "emailAddress": "Email address",
     "pleaseProvideAValidEmail": "Please provide a valid email address",
     "email": "Email",
     "required": "required",
     "submit": "Submit",
-    "backToLoginScreen": "Back to login screen"
+    "backToLoginScreen": "Back to login screen",
+    "couldNotGetLink": "Could not get the password reset link. Please try again."
   },
   "inviteForm": {
+    "switchFromManualNotice": "This invite is currently sent manually. Saving will change the Communication Method and send the invitation by Email/SMS to the contact entered.",
+    "confirmSwitchFromManualTitle": "Change Communication Method?",
+    "confirmSwitchFromManual": "This invite was set to Manual. Saving will change the Communication Method and send the invitation link to the email/phone entered. Do you want to continue?",
+    "confirmSwitchFromManualYes": "Change and send",
+    "confirmSwitchFromManualNo": "Cancel",
     "editInvite": "Edit invite",
     "cantUpdateAcceptedInvite": "You cannot edit invite if it has been already accepted by a patient, translation or guest.",
     "sendAnInvitation": "SEND AN INVITATION",
@@ -224,6 +246,7 @@
     "pleaseOnlyFillUpAnEmailOrAnMobilePhoneNumberEx": "Please enter only email or mobile number (+66)",
     "pleaseEnterValidEmailOrPhoneNumber": "Please enter an email or mobile number in the format +66",
     "pleaseOnlyFillUpAnEmailOrAnMobilePhoneNumber": "Please fill in only one  email or mobile number.",
+    "pleaseEnterAnEmailOrMobileNumber": "Please enter an email or mobile number.",
     "schedulingLater": "Plan later",
     "warningTranslatorMightBeLate": "The interpreter may respond from a less suitable location if the request is made less than 24 hours in advance.",
     "language": "Language",
@@ -413,7 +436,7 @@
     "ta": "Tamil",
     "te": "Telugu",
     "tg": "Tajik",
-    "th": "Thai",
+    "th": "ไทย",
     "ti": "Tigrinya",
     "tk": "Turkmen",
     "tl": "Tagalog",
@@ -446,9 +469,9 @@
     "takeOwnership": "Take Ownership",
     "terminate": "TERMINATE",
     "theConsultation": "THE CONSULTATION",
-    "theConsultationWillBeDisplayedIntoHistoryDuring24Hours": "The consultation will be displayed into history during 24 hours and you will not be able to communication anymore",
-    "terminateButKeepOpened": "Terminate but keep opened",
-    "youWillbeAbleToResumeTheConsultationLater": "You will be able to resume the consultation later but the nurse or the patient will not able to communite with you anymore.",
+    "theConsultationWillBeDisplayedIntoHistoryDuring24Hours": "The consultation will be displayed in the history for 24 hours and you will no longer be able to communicate.",
+    "terminateButKeepOpened": "Terminate but keep open",
+    "youWillbeAbleToResumeTheConsultationLater": "You will be able to resume the consultation later, but the nurse or the patient will no longer be able to communicate with you.",
     "staryInTheCurrentConsultation": "Stay in the current consultation",
     "doNotCloseTheConsultation": "Don't close the consultation",
     "consultationSummary": "CONSULTATION SUMMARY",
@@ -474,7 +497,8 @@
     "newInvite": "New invite",
     "noConsultationInvite": "No consultation invite",
     "phoneNumber": "Phone number",
-    "notDefined": "Undefined",
+    "notDefined": "Not provided",
+    "noContactManualLink": "No contact (link shared manually)",
     "lastname": "Name",
     "creationDate": "Creation date",
     "scheduledDate": "Scheduled date",
@@ -512,10 +536,10 @@
     "confirmResend": "Are you sure you want to resend the invitation? The invitation will be resent the way it was sent originally using the same channel. This action also resets expired invitations.",
     "cancelSendAgain": "Do not send back",
     "resendConfirmTitle": "Resend link",
-    "confirmRevoke": "Are you sure you want to revoke and delete this invitation? No message will be sent to the patient.",
-    "revoke": "Remove",
-    "cancelRevoke": "Do not delete",
-    "revokeConfirmTitle": "Delete an invitation",
+    "confirmRevoke": "Are you sure you want to cancel this invitation? The invitation link will no longer work. No message will be sent to the patient.",
+    "revoke": "Cancel invitation",
+    "cancelRevoke": "Keep invitation",
+    "revokeConfirmTitle": "Cancel invitation",
     "status": "State",
     "immediately": "Immediately",
     "communicationMethod": "Communication Method",
@@ -525,7 +549,8 @@
     "manual": "Manual",
     "getLink": "Get Link",
     "getInviteLinkTooltip": "Get the invitation link",
-    "errorGettingLink": "Error getting the invitation link"
+    "errorGettingLink": "Error getting the invitation link",
+    "linkUnavailableCanceled": "This invitation has been canceled. The link is no longer available."
   },
   "sideChat": {
     "startTheConsultation": "Start the consultation"
@@ -580,7 +605,7 @@
     "updateTheProfile": "Update the profile",
     "name": "Name",
     "notification": "Notification",
-    "enablesNotification": "This enables notification when an new consultation is requested.",
+    "enablesNotification": "This enables notification when a new consultation is requested.",
     "selectLanguage": "Language",
     "sms": "SMS",
     "whatsapp": "Whatsapp",
@@ -589,7 +614,7 @@
   },
   "resetPassword": {
     "changePassword": "Change password",
-    "youAreOnThisPage": "You are on this page because you followed a link use to update your password. Please fill up your new password bellow.",
+    "youAreOnThisPage": "You are on this page because you followed a link to update your password. Please fill in your new password below.",
     "yourPasswordHasBeenUpdated": "Your password has been updated. Please go back to login page to use your new password.",
     "login": "Login",
     "newPassword": "New password",
@@ -599,7 +624,7 @@
     "theBothPasswordAreNotTheSame": "The both password are not the same",
     "save": "Save",
     "backToLoginScreen": "Back to login screen",
-    "yourTokenHasExpired": "Your token has expired. Please request an new one.",
+    "yourTokenHasExpired": "Your token has expired. Please request a new one.",
     "iForgotMyPassword": "I forgot my password.",
     "anUnknownErrorHasBeenEncountered": "An unknown error has been encountered. Please try again.",
     "home": "HOME"
@@ -608,7 +633,18 @@
     "microTest": "MICRO TEST",
     "aProperlyTuned": "A properly tuned microphone should put the VU meter in the green center area when speaking.",
     "cameraTest": "CAMERA TEST",
-    "testError": "Testing failed, server returned"
+    "testError": "Testing failed, server returned",
+    "noTestToken": "Could not get a test session from the media server.",
+    "timeout": "The camera/microphone test did not start. Check that a camera and microphone are connected, that the browser is allowed to use them, and that the media server is reachable.",
+    "noDevice": "No camera or microphone was detected on this device.",
+    "noCamera": "No camera was detected on this device. Only the microphone is tested.",
+    "noMicrophone": "No microphone was detected on this device. Only the camera is tested.",
+    "permissionDenied": "The browser is not allowed to use the camera or microphone. Allow access in the browser settings and reload the page.",
+    "mediaServerTimeout": "Could not connect to the media server. Check your network connection and that the media server is reachable, then reload the page.",
+    "pageTitle": "Media test",
+    "connectingMediaServer": "Connecting to the media server...",
+    "mediaServerConnected": "Connected to the media server",
+    "mediaServerFailed": "Unable to connect to the media server. Your camera and microphone preview still works; please check your network or try again later."
   },
   "topNav": {
     "profile": "Profile",
@@ -630,7 +666,7 @@
   },
   "sendInviteLink": {
     "title": "Invite by link",
-    "subTitle": "Copy the link bellow and share with the patient with your preferred way. Warning, this link is usable only one time.",
+    "subTitle": "Copy the link below and share it with the patient in your preferred way. Warning: this link can be used only once.",
     "label": "Invite link",
     "close": "Close",
     "copied": "Copied to clipboard",
@@ -664,14 +700,15 @@
     "startTourSubmitBtnTitle": "Next",
     "endTourTitle": "Profile page",
     "endTourDescription": "You can change the language or enable SMS notifications in case something happens when you are not connected to this application.",
-    "endTourSubmitBtnTitle": "Ok"
+    "endTourSubmitBtnTitle": "Ok",
+    "pageTourEndTitle": "Tour of this page",
+    "pageTourEndDescription": "That was a quick tour of the menu available on every page. Would you like the full guided tour? It will walk you through the Invites, Waiting room and other pages and bring you back here at the end.",
+    "pageTourCloseBtnTitle": "Close",
+    "pageTourFullTourBtnTitle": "Start full tour"
   },
   "selectLanguage": {
     "en": "English",
-    "fr": "Français",
-    "uk": "Українська",
-    "es": "Español",
-    "kk": "Қазақ"
+    "th": "ไทย"
   },
   "pdf": {
     "consultationReport": "Consultation report",
@@ -685,6 +722,7 @@
     "consultationInformation": "Consultation information",
     "startDateTime": "Start date/time",
     "endDateTime": "End date/time",
+    "ongoing": "Ongoing",
     "duration": "Duration",
     "queue": "Queue",
     "closedBy": "Closed by",

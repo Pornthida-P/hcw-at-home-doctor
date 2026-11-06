@@ -335,6 +335,12 @@ export class ConsultationComponent implements OnInit, OnDestroy {
     }
   }
 
+  filterDevices(devices: MediaDeviceInfo[], kind: MediaDeviceKind) {
+    return devices.filter(
+      device => device.kind === kind && !!device.deviceId
+    );
+  }
+
   async checkDevices(): Promise<void> {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -345,28 +351,26 @@ export class ConsultationComponent implements OnInit, OnDestroy {
 
       const devices = await navigator.mediaDevices.enumerateDevices();
 
-      this.videoDevices = devices.filter(
-        device => device.kind === 'videoinput'
-      );
-      if (this.videoDevices.length && this.videoDevices[0].deviceId !== '') {
+      this.videoDevices = this.filterDevices(devices, 'videoinput');
+      if (
+        this.videoDevices.length &&
+        !this.videoDevices.some(d => d.deviceId === this.videoDeviceId)
+      ) {
         this.videoDeviceId = this.videoDevices[0].deviceId;
       }
 
-      this.audioDevices = devices.filter(
-        device => device.kind === 'audioinput'
-      );
-      if (this.audioDevices.length && this.audioDevices[0].deviceId !== '') {
+      this.audioDevices = this.filterDevices(devices, 'audioinput');
+      if (
+        this.audioDevices.length &&
+        !this.audioDevices.some(d => d.deviceId === this.audioDeviceId)
+      ) {
         this.audioDeviceId = this.audioDevices[0].deviceId;
       }
     } catch (error) {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
-        this.videoDevices = devices.filter(
-          device => device.kind === 'videoinput'
-        );
-        this.audioDevices = devices.filter(
-          device => device.kind === 'audioinput'
-        );
+        this.videoDevices = this.filterDevices(devices, 'videoinput');
+        this.audioDevices = this.filterDevices(devices, 'audioinput');
       } catch (e) {
         console.error('Error enumerating devices:', e);
       }
@@ -442,6 +446,28 @@ export class ConsultationComponent implements OnInit, OnDestroy {
           );
           this.showErrorDialog(
             errorMessage,
+            this.translate.instant('consultation.callError')
+          );
+          return;
+        }
+
+        // Video server (mediasoup) failures come back as 502/503/504
+        // with error=MEDIASOUP_*; a proxy error page (HTML) must not be shown raw
+        const isMediasoupError =
+          typeof err.error?.error === 'string' &&
+          err.error.error.startsWith('MEDIASOUP_');
+        const isHtmlBody =
+          typeof err.error === 'string' && /^\s*</.test(err.error);
+        if (
+          isMediasoupError ||
+          isHtmlBody ||
+          [502, 503, 504].includes(err.status)
+        ) {
+          const details = isMediasoupError
+            ? err.error?.details || err.error?.message
+            : `HTTP ${err.status || ''} ${err.statusText || ''}`.trim();
+          this.showErrorDialog(
+            `${this.translate.instant('consultation.videoServerUnavailable')} (${details})`,
             this.translate.instant('consultation.callError')
           );
           return;

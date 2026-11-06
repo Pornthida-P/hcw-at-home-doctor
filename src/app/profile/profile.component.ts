@@ -1,5 +1,6 @@
 import { UserService } from '../core/user.service';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 
 import { TranslateService } from '@ngx-translate/core';
@@ -10,14 +11,16 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { InviteService } from '../core/invite.service';
 import { TwilioWhatsappConfig } from '../../utils/twillo-whatsapp-config';
+import { normalizeThaiPhoneNumber } from '../shared/validators/phone-number-validator';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   currentUser;
+  private currentUserSub: Subscription;
   isSMSPhoneChanged = false;
   currentNotifPhoneNumber = '';
   enableNotif;
@@ -40,16 +43,30 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.currentUser = this.authService.currentUserValue;
-    this.currentNotifPhoneNumber = this.currentUser.notifPhoneNumber;
-    this.enableNotif = this.currentUser.enableNotif;
+    // follow the current user instead of reading it once (it may still be loading after a reload)
+    this.currentUserSub = this.authService.currentUser.subscribe(user => {
+      if (!user) {
+        return;
+      }
+      const firstLoad = !this.currentUser;
+      this.currentUser = user;
+      if (!firstLoad) {
+        return;
+      }
+      this.currentNotifPhoneNumber = this.currentUser.notifPhoneNumber;
+      this.enableNotif = this.currentUser.enableNotif;
 
-    if (this.currentNotifPhoneNumber) {
-      this.checkIfSupportedPrefix(this.currentNotifPhoneNumber)
-    }
-    if (this.currentUser.messageService) {
-      this.messageService = this.currentUser.messageService;
-    }
+      if (this.currentNotifPhoneNumber) {
+        this.checkIfSupportedPrefix(this.currentNotifPhoneNumber)
+      }
+      if (this.currentUser.messageService) {
+        this.messageService = this.currentUser.messageService;
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.currentUserSub?.unsubscribe();
   }
 
   checkIfSupportedPrefix(phoneNumber: string) {
@@ -182,6 +199,7 @@ export class ProfileComponent implements OnInit {
   }
 
   onSave() {
+      this.currentNotifPhoneNumber = normalizeThaiPhoneNumber(this.currentNotifPhoneNumber);
       if (!this.phoneNumberRegex.test(this.currentNotifPhoneNumber)) {
         this.openSnackBar(
           this.translate.instant('profile.invalidPhoneNumber'),

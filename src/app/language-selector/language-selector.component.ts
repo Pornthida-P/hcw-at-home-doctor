@@ -36,7 +36,7 @@ export class LanguageSelectorComponent implements OnInit {
   @Output() selectedLanguageChange = new EventEmitter();
   @Input() hideIcon: boolean = false;
   opened = false;
-  selectedLanguage = 'fr';
+  selectedLanguage = 'en';
 
   constructor(
     public translate: TranslateService,
@@ -45,13 +45,19 @@ export class LanguageSelectorComponent implements OnInit {
 
   ngOnInit() {
     const currentUser = this.authService.currentUserValue;
-    if (currentUser && currentUser.preferredLanguage) {
+    if (
+      currentUser &&
+      currentUser.preferredLanguage &&
+      supportedLanguages.includes(currentUser.preferredLanguage)
+    ) {
       this.selectedLanguage = currentUser.preferredLanguage;
       this.translate.use(currentUser.preferredLanguage);
       window.localStorage.setItem('hhw-lang', currentUser.preferredLanguage);
     } else {
-      this.selectedLanguage =
-        localStorage.getItem('hhw-lang') || supportedLanguages[0];
+      const savedLang = localStorage.getItem('hhw-lang');
+      this.selectedLanguage = supportedLanguages.includes(savedLang)
+        ? savedLang
+        : this.translate.currentLang || supportedLanguages[0];
     }
   }
 

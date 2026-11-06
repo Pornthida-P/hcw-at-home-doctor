@@ -8,6 +8,7 @@ import {User} from "../user";
 import {MatDialog} from "@angular/material/dialog";
 import {CguComponent} from "../cgu/cgu.component";
 import {TourService} from "ngx-ui-tour-md-menu";
+import { GuidedTourService } from "../core/guided-tour.service";
 import {StartTourComponent} from "../shared/components/start-tour/start-tour.component";
 import {TranslateService} from "@ngx-translate/core";
 
@@ -27,6 +28,7 @@ export class TermsAcceptanceComponent {
     public dialog: MatDialog,
     private authService: AuthService,
     private tourService: TourService,
+    private guidedTourService: GuidedTourService,
     private userService: UserService,
     public configService: ConfigService,
     private translate: TranslateService,
@@ -86,7 +88,7 @@ export class TermsAcceptanceComponent {
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.tourService.start();
+        this.guidedTourService.startFullTour();
       } else {
         this.router.navigate(['/dashboard']);
       }

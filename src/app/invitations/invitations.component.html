@@ -42,7 +42,7 @@
             <span *ngIf="invite.emailAddress">{{ invite.emailAddress }}</span>
             <span *ngIf="invite.phoneNumber">{{ invite.phoneNumber }}</span>
             <span *ngIf="!invite.phoneNumber && !invite.emailAddress">
-              {{ 'invitations.notDefined' | translate }}
+              {{ 'invitations.noContactManualLink' | translate }}
             </span>
             @if (InvitationStatusConfig[invite.status]) {
               <span
@@ -103,7 +103,7 @@
             {{ 'invitations.lastname' | translate }}
           </span>
           <div *ngIf="invite.firstName || invite.lastName">
-            {{ invite.firstName + ' ' + invite.lastName }}
+            {{ ((invite.firstName || '') + ' ' + (invite.lastName || '')).trim() }}
           </div>
           <div *ngIf="!invite.firstName && !invite.lastName">
             {{ 'invitations.notDefined' | translate }}
@@ -113,7 +113,7 @@
           <span class="tile-header">
             {{ 'invitations.creationDate' | translate }}
           </span>
-          {{ invite.createdAt | date: 'd MMM yyyy HH:mm' : 'fr' }}
+          {{ invite.createdAt | localDate: 'd MMM yyyy HH:mm' }}
         </td>
         <td class="hidden-mobile">
           <span class="tile-header">
@@ -142,7 +142,7 @@
             {{ getFormattedDate(invite.scheduledFor, invite.patientTZ) }} (
             {{ invite.patientTZ }} )
           } @else if (invite.scheduledFor) {
-            {{ invite.scheduledFor | date: 'd MMM yyyy HH:mm' }}
+            {{ invite.scheduledFor | localDate: 'd MMM yyyy HH:mm' }}
           } @else {
             {{ 'invitations.immediately' | translate }}
           }
@@ -181,6 +181,7 @@
           <div class="d-flex flex-column">
             <button
               *ngIf="
+                invite.status !== 'CANCELED' &&
                 !invite.resending &&
                 !invite.gettingLink &&
                 (!invite.translatorRequestInvite ||
@@ -206,7 +207,7 @@
               {{ 'consultations.sendAgainANewInvitation' | translate }}
             </button>
             <button
-              *ngIf="!invite.gettingLink"
+              *ngIf="!invite.gettingLink && invite.status !== 'CANCELED'"
               mat-stroked-button
               color="primary"
               (click)="getInviteLink(invite.id)"
@@ -215,6 +216,7 @@
               {{ 'invitations.getLink' | translate }}
             </button>
             <button
+              *ngIf="invite.status !== 'CANCELED'"
               mat-stroked-button
               color="primary"
               [routerLink]="['/invitations/' + invite.id]">
@@ -222,7 +224,7 @@
             </button>
           </div>
         </td>
-        @if (invite.status !== 'ACCEPTED') {
+        @if (invite.status !== 'ACCEPTED' && invite.status !== 'CANCELED') {
           <td>
             <span class="tile-header"></span>
             <div *ngIf="invite.revoking" class="loading">

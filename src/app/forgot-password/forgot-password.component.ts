@@ -36,7 +36,7 @@ export class ForgotPasswordComponent implements OnInit {
         })
         .catch(err => {
           console.log(err);
-          this.error = 'Impossible de récupérer le lien';
+          this.error = 'forgotPassword.couldNotGetLink';
         })
         .finally(() => {
           this.loading = false;

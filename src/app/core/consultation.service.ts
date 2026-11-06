@@ -23,6 +23,7 @@ export class ConsultationService {
   );
 
   currentUser;
+  activeChatConsultationId: string = null;
   consultationsOverviewSub: BehaviorSubject<any[]> = new BehaviorSubject(
     this.consultationsOverview
   );
@@ -45,7 +46,18 @@ export class ConsultationService {
         c => c._id === event.data._id
       );
       if (consultation) {
-        consultation.consultation.status = 'closed';
+        const handledByMe =
+          consultation.consultation.acceptedBy === this.currentUser?.id ||
+          consultation.consultation.doctor === this.currentUser?.id ||
+          event.data.consultation?.acceptedBy === this.currentUser?.id;
+        if (consultation.consultation.status === 'pending' && !handledByMe) {
+          // closed from a waiting room: it is not part of my history
+          this.consultationsOverview = this.consultationsOverview.filter(
+            c => c._id !== event.data._id
+          );
+        } else {
+          consultation.consultation.status = 'closed';
+        }
       }
       this.sortConsultations();
       this.consultationsOverviewSub.next(this.consultationsOverview);
@@ -73,7 +85,13 @@ export class ConsultationService {
         return;
       }
       c.lastMsg = msg.data;
-      c.unreadCount++;
+      const fromId = msg.data.from && (msg.data.from.id || msg.data.from);
+      const isOwnMessage = !!this.currentUser && fromId === this.currentUser.id;
+      const isOpenChat =
+        this.activeChatConsultationId === c._id && !document.hidden;
+      if (!isOwnMessage && !isOpenChat) {
+        c.unreadCount = (c.unreadCount || 0) + 1;
+      }
       this.updateUnreadCount();
       this.sortConsultations();
       this.consultationsOverviewSub.next(this.consultationsOverview);
@@ -271,6 +289,13 @@ export class ConsultationService {
   }
 
   readMessages(consultationId) {
+    const current = this.consultationsOverview.find(
+      c => c._id === consultationId
+    );
+    if (current) {
+      current.unreadCount = 0;
+      this.updateUnreadCount();
+    }
     return this.http
       .post<
         any[]
@@ -279,7 +304,9 @@ export class ConsultationService {
         const c = this.consultationsOverview.find(
           c => c._id === consultationId
         );
-        c.unreadCount = 0;
+        if (c) {
+          c.unreadCount = 0;
+        }
         this.updateUnreadCount();
       });
   }
@@ -368,6 +395,14 @@ export class ConsultationService {
     return this.http.post<any[]>(
       environment.api + `/consultation/${consultationId}/doctorFeedback`,
       { consultationId, rating, comment }
+    );
+  }
+
+  // Current expert ("Invite a colleague") link, built by the backend
+  // from EXPERT_URL/PUBLIC_URL (participant app) - generated if missing.
+  getExpertLink(consultationId: string): Observable<{ expertInvitationURL: string }> {
+    return this.http.get<{ expertInvitationURL: string }>(
+      environment.api + `/consultation/${consultationId}/expert-link`
     );
   }
 

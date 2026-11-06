@@ -29,6 +29,7 @@ import { InviteLinkComponent } from '../invite-link/invite-link.component';
 import { ErrorDialogComponent } from '../error-dialog/error-dialog.component';
 import { InviteExpertComponent } from '../invite-expoert/invite-expert.component';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { ImageViewerDialogComponent } from '../image-viewer-dialog/image-viewer-dialog.component';
 
 @Component({
   selector: 'app-chat',
@@ -83,6 +84,13 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.calculateHeight();
   }
 
+  @HostListener('document:visibilitychange')
+  onVisibilityChange() {
+    if (!document.hidden && this.showInput && this.consultation) {
+      this.readMessages();
+    }
+  }
+
   ngOnInit() {
     this.currentUser = this.authService.currentUserValue;
     this.acceptAll = !!this.configService.config?.extraMimeTypes;
@@ -90,10 +98,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.getMessages();
 
     if (this.showInput) {
+      this.consultationService.activeChatConsultationId =
+        this.consultation._id || this.consultation.id;
       this.readMessages();
     }
 
-    this.socketEventsService.onMessage().subscribe(msg => {
+    this.subscriptions.push(this.socketEventsService.onMessage().subscribe(msg => {
       if (
         msg.data.consultation !==
         (this.consultation._id || this.consultation.id)
@@ -106,9 +116,19 @@ export class ChatComponent implements OnInit, OnDestroy {
 
         this.scrollToBottom();
       });
-    });
 
-    this.socketEventsService.onOwnershipTransferred().subscribe(event => {
+      // the chat is open: a message received now is read, don't leave it counted as unread
+      const fromId = msg.data.from && (msg.data.from.id || msg.data.from);
+      if (
+        this.showInput &&
+        !document.hidden &&
+        (!this.currentUser || fromId !== this.currentUser.id)
+      ) {
+        this.readMessages();
+      }
+    }));
+
+    this.subscriptions.push(this.socketEventsService.onOwnershipTransferred().subscribe(event => {
       if (
         event.data &&
         event.data.consultation &&
@@ -123,12 +143,12 @@ export class ChatComponent implements OnInit, OnDestroy {
           this.consultation.doctor = event.data.newOwner;
         }
       }
-    });
+    }));
 
     this.listenToCallEvents();
-    this.breakpointObserver.observe([Breakpoints.XSmall]).subscribe(result => {
+    this.subscriptions.push(this.breakpointObserver.observe([Breakpoints.XSmall]).subscribe(result => {
       this.isMobile = result.matches;
-    });
+    }));
   }
 
   inviteExpert(expertLink: string) {
@@ -272,6 +292,13 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (
+      this.consultation &&
+      this.consultationService.activeChatConsultationId ===
+        (this.consultation._id || this.consultation.id)
+    ) {
+      this.consultationService.activeChatConsultationId = null;
+    }
     this.subscriptions.forEach(subscription => {
       subscription?.unsubscribe();
     });
@@ -383,20 +410,8 @@ export class ChatComponent implements OnInit, OnDestroy {
       const user = this.authService.currentUserValue;
 
       if (msg.mimeType.endsWith('jpeg') || msg.mimeType.endsWith('png')) {
-        fetch(requestUrl, {
-          headers: {
-            'Authorization': `Bearer ${user.token}`,
-          },
-        })
-          .then(res => {
-            return res.blob();
-          })
-          .then(imageFile => {
-            msg.isImage = true;
-            msg.attachmentsURL = this._sanitizer.bypassSecurityTrustResourceUrl(
-              URL.createObjectURL(imageFile)
-            );
-          });
+        msg.imageRequestUrl = requestUrl;
+        this.loadImage(msg, user?.token);
       } else if (msg.mimeType.startsWith('audio')) {
         msg.isAudio = true;
       } else {
@@ -422,6 +437,76 @@ export class ChatComponent implements OnInit, OnDestroy {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(link.href);
+    });
+  }
+
+  loadImage(msg, token: string, attempt = 0): void {
+    msg.imageLoading = true;
+    msg.imageError = false;
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timeoutId = setTimeout(() => {
+      if (controller) {
+        controller.abort();
+      }
+    }, 45000);
+    fetch(msg.imageRequestUrl, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      signal: controller ? controller.signal : undefined,
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        return res.blob();
+      })
+      .then(imageFile => {
+        clearTimeout(timeoutId);
+        this.zone.run(() => {
+          const rawUrl = URL.createObjectURL(imageFile);
+          msg.isImage = true;
+          msg.imageLoading = false;
+          msg.imageRawUrl = rawUrl;
+          msg.attachmentsURL = this._sanitizer.bypassSecurityTrustResourceUrl(
+            rawUrl
+          );
+        });
+      })
+      .catch(err => {
+        clearTimeout(timeoutId);
+        if (attempt < 1) {
+          setTimeout(() => this.loadImage(msg, token, attempt + 1), 1500);
+          return;
+        }
+        console.error('Error loading chat image', err);
+        this.zone.run(() => {
+          msg.imageLoading = false;
+          msg.imageError = true;
+        });
+      });
+  }
+
+  retryImage(msg): void {
+    const user = this.authService.currentUserValue;
+    this.loadImage(msg, user?.token);
+  }
+
+  openImageViewer(msg): void {
+    if (!msg?.imageRawUrl) {
+      return;
+    }
+    this.dialog.open(ImageViewerDialogComponent, {
+      panelClass: 'image-viewer-dialog-panel',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      width: '90vw',
+      autoFocus: false,
+      data: {
+        rawUrl: msg.imageRawUrl,
+        fileName: msg.fileName || 'image',
+        alt: msg.fileName || 'Image',
+      },
     });
   }
 

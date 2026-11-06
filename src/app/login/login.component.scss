@@ -7,14 +7,13 @@
     max-width: 623px;
     background-size: cover;
     background-position: bottom;
-    background-image: url("/assets/bg-splash@2x.png");
+    background-image: url('../../assets/bg-splash@2x.png');
   }
 
   .auth-main {
     flex-grow: 1;
   }
 }
-
 
 .example-form {
   min-width: 150px;
@@ -30,7 +29,6 @@
     font-weight: 400;
   }
 }
-
 
 .container {
   width: 400px;
@@ -63,7 +61,6 @@
   align-items: center;
   justify-content: center;
 }
-
 
 h4 {
   text-align: center;
@@ -101,7 +98,6 @@ h4 {
   margin-top: 20px;
   min-height: 80px;
 }
-
 
 .row {
   margin: 10px;

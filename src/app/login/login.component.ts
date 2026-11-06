@@ -88,7 +88,10 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.openIdLoginUrl += `&redirectUrl=${encodeURIComponent(this.returnUrl)}`;
     }
 
-    if (this.authService.currentUserValue) {
+    if (
+      this.authService.currentUserValue &&
+      this.authService.isAllowedUser(this.authService.currentUserValue)
+    ) {
       const urlParts = this.returnUrl.split('?');
       const path = urlParts[0];
       const queryParams = {};
@@ -104,6 +107,20 @@ export class LoginComponent implements OnInit, OnDestroy {
 
       this.router.navigate([path], { queryParams });
     }
+
+    // Clear the previous server error as soon as the user edits the form,
+    // so it is not displayed together with the new validation messages.
+    [
+      this.emailFormControl,
+      this.passwordFormControl,
+      this.codeFormControl,
+    ].forEach(control => {
+      this.subscriptions.push(
+        control.valueChanges.subscribe(() => {
+          this.error = '';
+        })
+      );
+    });
 
     this.subscriptions.push(
       this.authService.getCurrentUser().subscribe(
@@ -154,7 +171,7 @@ export class LoginComponent implements OnInit, OnDestroy {
               }, 1000);
             },
             error => {
-              this.error = error;
+              this.error = this.getErrorMessage(error);
               this.loading = false;
             }
           )
@@ -189,6 +206,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   // When the user submits the local form
   loginLocal() {
     this.error = '';
+    if (this.emailFormControl.invalid || this.passwordFormControl.invalid) {
+      this.emailFormControl.markAsTouched();
+      this.passwordFormControl.markAsTouched();
+      return;
+    }
     this.loading = true;
     this.subscriptions.push(
       this.authService.loginLocal(this.email, this.password).subscribe(
@@ -200,12 +222,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         },
         err => {
           this.loading = false;
-          this.error =
-            err.details ||
-            err.error?.message ||
-            err.statusText ||
-            err.message ||
-            err;
+          this.error = this.getErrorMessage(err);
         }
       )
     );
@@ -226,12 +243,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.error = this.translate.instant('login.youReachedTheMaximumAttemptAmount');
           }
           this.loading = false;
-          this.error =
-            err.details ||
-            err.error?.message ||
-            err.statusText ||
-            err.message ||
-            err;
+          this.error = this.getErrorMessage(err);
         }
       )
     );
@@ -248,16 +260,24 @@ export class LoginComponent implements OnInit, OnDestroy {
           },
           err => {
             this.loading = false;
-            this.error =
-              err.details ||
-              err.error?.message ||
-              err.statusText ||
-              err.message ||
-              err;
+            this.error = this.getErrorMessage(err);
           }
         )
     );
   }
+  getErrorMessage(err) {
+    if (err && (err.code === 'ROLE_NOT_ALLOWED' || err.error?.code === 'ROLE_NOT_ALLOWED')) {
+      return this.translate.instant('login.roleNotAllowed');
+    }
+    return (
+      err.details ||
+      err.error?.message ||
+      err.statusText ||
+      err.message ||
+      err
+    );
+  }
+
   ngOnDestroy(): void {
     this.subscriptions.forEach((subscription: Subscription) => {
       subscription?.unsubscribe();

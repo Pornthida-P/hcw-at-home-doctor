@@ -7,12 +7,19 @@ import {
   ElementRef,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { filter, first } from 'rxjs/operators';
 import { AuthService } from './auth/auth.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 import { SocketEventsService } from './core/socket-events.service';
 import { ConsultationService } from './core/consultation.service';
-import { Router, NavigationStart } from '@angular/router';
+import {
+  Router,
+  NavigationStart,
+  NavigationEnd,
+  NavigationCancel,
+  NavigationError,
+} from '@angular/router';
 import { ConfigService } from './core/config.service';
 import { TranslateService } from '@ngx-translate/core';
 import {
@@ -25,6 +32,7 @@ import { SidenavToggleService } from './core/sidenav-toggle.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { IStepOption, TourService } from 'ngx-ui-tour-md-menu';
 import { TourType } from './models/tour';
+import { GuidedTourService } from './core/guided-tour.service';
 import { MatDialog } from '@angular/material/dialog';
 import { WebviewDetectionService } from './core/webview-detection.service';
 import { WebviewWarningComponent } from './webview-warning/webview-warning.component';
@@ -47,8 +55,10 @@ export class AppComponent implements OnInit, OnDestroy {
   token = '';
   isLoggedIn = false;
   navigated;
+  initialNavigationDone = false;
   pendingConsultations;
   activeConsultations;
+  private unreadActiveCountSubscription: Subscription;
   currentSnackBar: MatSnackBarRef<SimpleSnackBar>;
   markdownExists: boolean = false;
   markdownUrl: string = 'assets/footer.md';
@@ -65,6 +75,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private _snackBar: MatSnackBar,
     private authService: AuthService,
     private tourService: TourService,
+    private guidedTourService: GuidedTourService,
     private translate: TranslateService,
     public configService: ConfigService,
     private breakpointObserver: BreakpointObserver,
@@ -147,73 +158,84 @@ export class AppComponent implements OnInit, OnDestroy {
     );
     iconRegistry.addSvgIcon(
       'logout',
-      sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/icon-logout.svg')
+      sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-logout.svg')
     );
     iconRegistry.addSvgIcon(
       'attach',
-      sanitizer.bypassSecurityTrustResourceUrl(
-        '../assets/svg/icon-attachment.svg'
-      )
+      sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-attachment.svg')
     );
     iconRegistry.addSvgIcon(
       'pdf',
-      sanitizer.bypassSecurityTrustResourceUrl(
-        '../assets/svg/file-pdf-solid.svg'
-      )
+      sanitizer.bypassSecurityTrustResourceUrl('assets/svg/file-pdf-solid.svg')
     );
     iconRegistry.addSvgIcon(
       'send',
       sanitizer.bypassSecurityTrustResourceUrl(
-        '../assets/svg/paper-plane-solid.svg'
+        'assets/svg/paper-plane-solid.svg'
       )
     );
     iconRegistry.addSvgIcon(
       'question',
       sanitizer.bypassSecurityTrustResourceUrl(
-        '../assets/svg/question-circle-solid.svg'
+        'assets/svg/question-circle-solid.svg'
       )
     );
     iconRegistry.addSvgIcon(
       'selfcheck',
-      sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/self-check.svg')
+      sanitizer.bypassSecurityTrustResourceUrl('assets/svg/self-check.svg')
     );
     iconRegistry.addSvgIcon(
       'check',
-      sanitizer.bypassSecurityTrustResourceUrl(
-        '../assets/svg/icon-checkFull.svg'
-      )
+      sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-checkFull.svg')
     );
     iconRegistry.addSvgIcon(
       'invite',
-      sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/icon-invite.svg')
+      sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-invite.svg')
     );
     iconRegistry.addSvgIcon(
       'copy',
-      sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/copy.svg')
+      sanitizer.bypassSecurityTrustResourceUrl('assets/svg/copy.svg')
     );
     iconRegistry.addSvgIcon(
       'fail',
-      sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/fail.svg')
+      sanitizer.bypassSecurityTrustResourceUrl('assets/svg/fail.svg')
     );
     iconRegistry.addSvgIcon(
       'in-new-tab',
-      sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/in-new-tab.svg')
+      sanitizer.bypassSecurityTrustResourceUrl('assets/svg/in-new-tab.svg')
     );
     iconRegistry.addSvgIcon(
       'filter',
-      sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/filter.svg')
+      sanitizer.bypassSecurityTrustResourceUrl('assets/svg/filter.svg')
     );
     iconRegistry.addSvgIcon(
       'enlarge',
-      sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/icon-enlarge.svg')
+      sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-enlarge.svg')
     );
   }
 
   ngOnInit() {
+    const finishBoot = () => {
+      this.initialNavigationDone = true;
+    };
+    this.router.events
+      .pipe(
+        filter(
+          event =>
+            event instanceof NavigationEnd ||
+            event instanceof NavigationCancel ||
+            event instanceof NavigationError
+        ),
+        first()
+      )
+      .subscribe(() => finishBoot());
+    // Safety net: never leave the boot loader up forever (e.g. race on F5).
+    setTimeout(finishBoot, 8000);
+
     if (this.webviewDetectionService.isWebView()) {
       this.dialog.open(WebviewWarningComponent, {
         disableClose: true,
-        panelClass: 'webview-warning-dialog'
+        panelClass: 'webview-warning-dialog',
       });
       return;
     }
@@ -235,15 +257,16 @@ export class AppComponent implements OnInit, OnDestroy {
       this.isMobile = result.matches;
     });
 
-    this.sidenavSubscription = this.sidenavToggleService.sidenavState$.subscribe((action) => {
-      if (action === 'open') {
-        this.sidenav.open();
-      } else if (action === 'close') {
-        this.sidenav.close();
-      } else {
-        this.sidenav.toggle();
-      }
-    });
+    this.sidenavSubscription =
+      this.sidenavToggleService.sidenavState$.subscribe(action => {
+        if (action === 'open') {
+          this.sidenav.open();
+        } else if (action === 'close') {
+          this.sidenav.close();
+        } else {
+          this.sidenav.toggle();
+        }
+      });
 
     this.token = this.GetParam('tk');
     this.checkMarkdown();
@@ -274,17 +297,19 @@ export class AppComponent implements OnInit, OnDestroy {
           this.isLoggedIn = true;
 
           this.initServices();
-
-          setTimeout(() => (this.navigated = true), 1);
+          // Set synchronously so the logged-in router-outlet exists before
+          // the first navigation settles (avoids a Thai-boot race where the
+          // public outlet is destroyed while navigated is still false).
+          this.navigated = true;
         }
       });
     });
   }
 
-
   initializeTour() {
     this.translate
-        .get([
+      .get(
+        [
           'tour.invitesMenuTitle',
           'tour.invitesMenuContent',
           'tour.newInviteButtonTitle',
@@ -306,105 +331,109 @@ export class AppComponent implements OnInit, OnDestroy {
           'tour.nextBtnTitle',
           'tour.prevBtnTitle',
           'tour.endBtnTitle',
-        ], this.configService.config)
-        .subscribe(
-            (translations) => {
-              this.steps = [
-                {
-                  anchorId: TourType.INVITES_MENU,
-                  route: `/invitations`,
-                  isAsync: true,
-                  delayBeforeStepShow: 500,
-                  title: translations['tour.invitesMenuTitle'],
-                  placement: { xPosition: 'before', yPosition: 'above' },
-                  content: translations['tour.invitesMenuContent'],
-                },
-                {
-                  isAsync: true,
-                  anchorId: TourType.NEW_INVITE_BUTTON,
-                  title: translations['tour.newInviteButtonTitle'],
-                  content: translations['tour.newInviteButtonContent'],
-                },
-                {
-                  anchorId: TourType.REMOTE_PATIENT_INVITE,
-                  isAsync: true,
-                  title: translations['tour.remotePatientInviteTitle'],
-                  content: translations['tour.remotePatientInviteContent'],
-                  placement: { xPosition: 'before', yPosition: 'below' },
-                  backdropConfig: {
-                    zIndex: '2000',
-                  },
-                  stepDimensions: {
-                    minWidth: '300px'
-                  }
-                },
-                {
-                  anchorId: TourType.INVITE_FORM_CONTACT_INPUT,
-                  isAsync: true,
-                  title: translations['tour.inviteFormContactInputTitle'],
-                  content: translations['tour.inviteFormContactInputContent'],
-                  popoverClass: 'overflow-hidden',
-                  backdropConfig: {
-                    zIndex: '2000',
-                  }
-                },
-                {
-                  anchorId: TourType.INVITE_FORM_SEND_LINK_MANUALLY_INPUT,
-                  isAsync: true,
-                  title: translations['tour.inviteFormSendLinkManuallyTitle'],
-                  content: translations['tour.inviteFormSendLinkManuallyContent'],
-                  popoverClass: 'overflow-hidden',
-                  backdropConfig: {
-                    zIndex: '2000',
-                  }
-                },
-                {
-                  anchorId: TourType.WAITING_ROOM_MENU,
-                  title: translations['tour.waitingRoomMenuTitle'],
-                  content: translations['tour.waitingRoomMenuContent'],
-                  route: '/pending-consultations',
-                  placement: { xPosition: 'before', yPosition: 'above' },
-                },
-                {
-                  anchorId: TourType.OPENED_CONSULTATIONS_MENU,
-                  title: translations['tour.openedConsultationsMenuTitle'],
-                  content: translations['tour.openedConsultationsMenuContent'],
-                  route: '/active-consultations',
-                  placement: { xPosition: 'before', yPosition: 'above' },
-                  stepDimensions: {
-                    minWidth: '300px'
-                  }
-                },
-                {
-                  anchorId: TourType.CONSULTATION_HISTORY_MENU,
-                  title: translations['tour.consultationsHistoryMenuTitle'],
-                  content: translations['tour.consultationsHistoryMenuContent'],
-                  route: '/closed-consultations',
-                  placement: { xPosition: 'before', yPosition: 'above' },
-                },
-                {
-                  anchorId: TourType.HEADER_PROFILE_MENU,
-                  isAsync: true,
-                  placement: { xPosition: 'before', yPosition: 'above' },
-                  title: translations['tour.headerProfileMenuTitle'],
-                  content: translations['tour.headerProfileMenuContent'],
-                },
-              ];
-              this.tourService.initialize(this.steps, {
-                enableBackdrop: true,
-                popoverClass: 'tour-backdrop',
-                nextBtnTitle: this.translate.instant('tour.nextBtnTitle'),
-                prevBtnTitle: this.translate.instant('tour.prevBtnTitle'),
-                endBtnTitle: this.translate.instant('tour.endBtnTitle'),
-                backdropConfig: {
-                  offset: 10,
-                },
-              });
+        ],
+        this.configService.config
+      )
+      .subscribe(
+        translations => {
+          this.steps = [
+            {
+              anchorId: TourType.INVITES_MENU,
+              route: `/invitations`,
+              isAsync: true,
+              delayBeforeStepShow: 500,
+              title: translations['tour.invitesMenuTitle'],
+              placement: { xPosition: 'before', yPosition: 'above' },
+              content: translations['tour.invitesMenuContent'],
             },
-            (error) => {
-              console.error('Translation loading failed', error);
-            }
-        );
+            {
+              isAsync: true,
+              anchorId: TourType.NEW_INVITE_BUTTON,
+              title: translations['tour.newInviteButtonTitle'],
+              content: translations['tour.newInviteButtonContent'],
+            },
+            {
+              anchorId: TourType.REMOTE_PATIENT_INVITE,
+              isAsync: true,
+              title: translations['tour.remotePatientInviteTitle'],
+              content: translations['tour.remotePatientInviteContent'],
+              placement: { xPosition: 'before', yPosition: 'below' },
+              backdropConfig: {
+                zIndex: '2000',
+              },
+              stepDimensions: {
+                minWidth: '300px',
+              },
+            },
+            {
+              anchorId: TourType.INVITE_FORM_CONTACT_INPUT,
+              isAsync: true,
+              title: translations['tour.inviteFormContactInputTitle'],
+              content: translations['tour.inviteFormContactInputContent'],
+              popoverClass: 'overflow-hidden',
+              backdropConfig: {
+                zIndex: '2000',
+              },
+            },
+            {
+              anchorId: TourType.INVITE_FORM_SEND_LINK_MANUALLY_INPUT,
+              isAsync: true,
+              title: translations['tour.inviteFormSendLinkManuallyTitle'],
+              content: translations['tour.inviteFormSendLinkManuallyContent'],
+              popoverClass: 'overflow-hidden',
+              backdropConfig: {
+                zIndex: '2000',
+              },
+            },
+            {
+              anchorId: TourType.WAITING_ROOM_MENU,
+              title: translations['tour.waitingRoomMenuTitle'],
+              content: translations['tour.waitingRoomMenuContent'],
+              route: '/pending-consultations',
+              placement: { xPosition: 'before', yPosition: 'above' },
+            },
+            {
+              anchorId: TourType.OPENED_CONSULTATIONS_MENU,
+              title: translations['tour.openedConsultationsMenuTitle'],
+              content: translations['tour.openedConsultationsMenuContent'],
+              route: '/active-consultations',
+              placement: { xPosition: 'before', yPosition: 'above' },
+              stepDimensions: {
+                minWidth: '300px',
+              },
+            },
+            {
+              anchorId: TourType.CONSULTATION_HISTORY_MENU,
+              title: translations['tour.consultationsHistoryMenuTitle'],
+              content: translations['tour.consultationsHistoryMenuContent'],
+              route: '/closed-consultations',
+              placement: { xPosition: 'before', yPosition: 'above' },
+            },
+            {
+              anchorId: TourType.HEADER_PROFILE_MENU,
+              isAsync: true,
+              placement: { xPosition: 'before', yPosition: 'above' },
+              title: translations['tour.headerProfileMenuTitle'],
+              content: translations['tour.headerProfileMenuContent'],
+            },
+          ];
+          // Steps are handed to GuidedTourService, which runs either
+          // the full tour (navigates) or a page-only tour (no navigation)
+          this.guidedTourService.setSteps(this.steps, {
+            enableBackdrop: true,
+            popoverClass: 'tour-backdrop',
+            nextBtnTitle: this.translate.instant('tour.nextBtnTitle'),
+            prevBtnTitle: this.translate.instant('tour.prevBtnTitle'),
+            endBtnTitle: this.translate.instant('tour.endBtnTitle'),
+            backdropConfig: {
+              offset: 10,
+            },
+          });
+        },
+        error => {
+          console.error('Translation loading failed', error);
+        }
+      );
   }
 
   getConsultationsOverview() {
@@ -415,11 +444,22 @@ export class AppComponent implements OnInit, OnDestroy {
           this.pendingConsultations = consultations.filter(c => {
             return c.consultation.status === 'pending';
           }).length;
-          this.activeConsultations = consultations.filter(c => {
-            return c.consultation.status === 'active';
-          }).length;
+          // Sidebar "Opened" badge = unread messages across active consultations
+          // (resets when chat opens — same as per-row unread / BUG-012).
+          this.activeConsultations = consultations
+            .filter(c => c.consultation.status === 'active')
+            .reduce((sum, c) => sum + (c.unreadCount || 0), 0);
         });
       });
+    if (!this.unreadActiveCountSubscription) {
+      this.unreadActiveCountSubscription = this.consultationService
+        .unreadActiveCount()
+        .subscribe(count => {
+          this.zone.run(() => {
+            this.activeConsultations = count || 0;
+          });
+        });
+    }
   }
 
   initServices() {
@@ -541,6 +581,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    if (this.unreadActiveCountSubscription) {
+      this.unreadActiveCountSubscription.unsubscribe();
+    }
     if (this.routerSubscription) {
       this.routerSubscription?.unsubscribe();
     }

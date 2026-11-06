@@ -1,55 +1,29 @@
-# HCW@Home — Doctor Frontend
+# HCWAtHome
 
-This folder contains the **HCW@Home doctor/caregiver** frontend source code (Angular). The app is built and served by a web server such as Nginx in production. Build output goes to the `dist/` folder.
-
-## Prerequisites
-
-- Node.js (v18+ recommended)
-
-## Setup (before first run)
-
-Install the local shared library:
-
-```bash
-npm i --no-save ../../hug-angular/dist/hug-angular-lib
-```
-
-Then install app dependencies:
-
-```bash
-npm install
-```
-
+# Before running 
+`npm i --no-save ../../hug-angular/dist/hug-angular-lib`
 ## Development server
 
-```bash
-npm start
-```
-
-Then open **http://localhost:4200/**. The app will reload when you change source files.
-
-## Build
-
-```bash
-npm run build
-```
-
-For a production build with optimizations, use the production configuration (e.g. `ng build --configuration=production` if configured). Artifacts are in `dist/`.
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ## Code scaffolding
 
-- New component: `ng generate component component-name`
-- Other: `ng generate directive|pipe|service|class|guard|interface|enum|module`
+Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-## Tests
+## Build
 
-- **Unit tests:** `npm test` (Karma)
-- **E2E tests:** `npm run e2e` (Protractor)
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 
-## Deploy
+## Running unit tests
 
-See: **https://docs.hcw-at-home.com/deploy/**
+Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-## Angular CLI
+## Running end-to-end tests
 
-For more commands: `ng help` or [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+
+## Further help
+
+To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+

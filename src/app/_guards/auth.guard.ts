@@ -5,6 +5,9 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
 import { AuthService } from '../auth/auth.service';
 
 @Injectable({ providedIn: 'root' })
@@ -14,20 +17,21 @@ export class AuthGuard {
     private authService: AuthService
   ) {}
 
-  private readonly allowedRoles = ['doctor', 'scheduler', 'admin'];
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> {
+    return this.authService.resolveCurrentUser().pipe(
+      map(currentUser => {
+        if (currentUser && this.authService.isAllowedUser(currentUser)) {
+          return true;
+        }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    const currentUser = this.authService.currentUserValue;
-    if (currentUser && this.allowedRoles.includes(currentUser.role)) {
-      return true;
-    }
-    if (currentUser && !this.allowedRoles.includes(currentUser.role)) {
-      this.authService.logout(true);
-      return false;
-    }
-    this.router.navigate(['/login'], {
-      queryParams: { returnUrl: state.url, ...state.root.queryParams },
-    });
-    return false;
+        this.router.navigate(['/login'], {
+          queryParams: { returnUrl: state.url, ...state.root.queryParams },
+        });
+        return false;
+      })
+    );
   }
 }

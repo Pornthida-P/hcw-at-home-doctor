@@ -116,3 +116,12 @@ markdown ::ng-deep {
   }
 
 }
+
+/* Message shown when no terms file is deployed */
+.terms-not-available {
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff4e5;
+  color: #663c00;
+  text-align: center;
+}

@@ -129,7 +129,7 @@
               {{ 'chat.patientBirthday' | translate }}
             </div>
             <div class="c_info_row_content">
-              {{ consultation.consultation.birthDate | date: 'd MMM yyyy' }}
+              {{ consultation.consultation.birthDate | localDate: 'd MMM yyyy' }}
             </div>
           </div>
           <div class="c_info_wrap">
@@ -164,8 +164,8 @@
               {{ 'chat.doctor' | translate }}
             </div>
             <div class="c_info_row_content">
-              {{ currentUser?.firstName }}
-              {{ currentUser?.lastName | uppercase }}
+              {{ currentUser.firstName }}
+              {{ currentUser.lastName | uppercase }}
             </div>
           </div>
 
@@ -176,7 +176,7 @@
             <div class="c_info_row_content">
               {{
                 consultation.consultation.createdAt
-                  | date: 'd MMM yyyy HH:mm' : 'fr'
+                  | localDate: 'd MMM yyyy HH:mm'
               }}
             </div>
           </div>
@@ -250,8 +250,9 @@
             </div>
             <div class="c_info_row_content">
               {{
-                consultation.consultation.acceptedAt
-                  | date: 'd MMM yyyy HH:mm' : 'fr'
+                (consultation.consultation.acceptedAt ||
+                  consultation.consultation.createdAt)
+                  | localDate: 'd MMM yyyy HH:mm'
               }}
             </div>
           </div>
@@ -286,7 +287,7 @@
             <div class="c_info_row_content">
               {{
                 consultation.consultation.closedAt
-                  | date: 'd MMM yyyy HH:mm' : 'fr'
+                  | localDate: 'd MMM yyyy HH:mm'
               }}
             </div>
           </div>
@@ -297,10 +298,12 @@
             <div class="c_info_row_title">
               {{ 'chat.duration' | translate }}
             </div>
+            <!-- Same formula as closed-consultations history and the PDF: closedAt - (acceptedAt || createdAt) -->
             <div class="c_info_row_content">
               {{
-                consultation.consultation.createdAt -
-                  consultation.consultation.closedAt | duration
+                consultation.consultation.closedAt -
+                  (consultation.consultation.acceptedAt ||
+                    consultation.consultation.createdAt) | duration
               }}
             </div>
           </div>
@@ -352,18 +355,41 @@
             <source [src]="msg.attachmentsURL" type="audio/mpeg" />
             {{ 'chat.yourBrowserDoesNotSupportTheAudioElement' | translate }}
           </audio>
+          <div
+            *ngIf="msg.imageLoading"
+            class="chat-image-placeholder"
+            role="status">
+            <mat-spinner [diameter]="28"></mat-spinner>
+            <span>{{ 'chat.imageLoading' | translate }}</span>
+          </div>
+          <div
+            *ngIf="msg.imageError && !msg.imageLoading"
+            class="chat-image-placeholder chat-image-error"
+            role="alert">
+            <span>{{ 'chat.imageLoadFailed' | translate }}</span>
+            <button
+              mat-stroked-button
+              color="primary"
+              type="button"
+              (click)="retryImage(msg)">
+              {{ 'chat.retryImage' | translate }}
+            </button>
+          </div>
           <img
             *ngIf="msg.isImage"
+            class="chat-image-thumbnail"
             (load)="imageLoaded()"
             (error)="imageLoaded()"
-            style="width: 70%; display: block; float: left; max-height: 990px"
+            (click)="openImageViewer(msg)"
             [src]="msg.attachmentsURL"
-            alt="Couldn't load image" />
+            [alt]="msg.fileName || ('chat.image' | translate)" />
 
           <div class="bubble" *ngIf="msg.text || msg.isFile">
             <div [ngClass]="{ 'big-font': noPagination }">
-              <p class="message-text" *ngIf="msg.text" [innerHTML]="msg.text | linkify">
-              </p>
+              <p
+                class="message-text"
+                *ngIf="msg.text"
+                [innerHTML]="msg.text | linkify"></p>
               <button
                 *ngIf="msg.isFile"
                 color="primary"
@@ -392,7 +418,7 @@
             <span
               style="display: block; text-align: center; margin-top: 10px"
               class="msg-time">
-              {{ msg.createdAt | date: 'd MMMM HH:mm' : 'fr-fr' }}
+              {{ msg.createdAt | localDate: 'd MMMM HH:mm' }}
             </span>
           </div>
           <div *ngIf="msg.acceptedAt && msg.closedAt" style="margin: 22px auto">
@@ -400,7 +426,7 @@
             <span
               style="display: block; text-align: center; margin-top: 10px"
               class="msg-time">
-              {{ msg.closedAt | date: 'd MMMM HH:mm' : 'fr-fr' }}
+              {{ msg.closedAt | localDate: 'd MMMM HH:mm' }}
             </span>
           </div>
         </div>
@@ -419,7 +445,7 @@
             <span
               style="display: block; text-align: center; margin-top: 10px"
               class="msg-time">
-              {{ msg.createdAt | date: 'd MMMM HH:mm' : 'fr-fr' }}
+              {{ msg.createdAt | localDate: 'd MMMM HH:mm' }}
             </span>
           </div>
           <div *ngIf="msg.acceptedAt && msg.closedAt" style="margin: 22px auto">
@@ -427,7 +453,7 @@
             <span
               style="display: block; text-align: center; margin-top: 10px"
               class="msg-time">
-              {{ msg.closedAt | date: 'd MMMM HH:mm' : 'fr-fr' }}
+              {{ msg.closedAt | localDate: 'd MMMM HH:mm' }}
             </span>
           </div>
         </div>
@@ -450,7 +476,7 @@
             -
           </span>
           <span class="msg-time">
-            {{ msg.createdAt | date: 'd MMMM HH:mm' : 'fr-fr' }}
+            {{ msg.createdAt | localDate: 'd MMMM HH:mm' }}
           </span>
         </div>
       </div>
@@ -480,6 +506,8 @@
         (click)="readMessages()"
         [(ngModel)]="chatText"
         name="chatInput"
+        [attr.aria-label]="'chat.typeYourMessage' | translate"
+        [placeholder]="'chat.typeYourMessage' | translate"
         matInput></textarea>
       <button (click)="send()" color="primary" mat-mini-fab>
         <mat-icon svgIcon="send"></mat-icon>

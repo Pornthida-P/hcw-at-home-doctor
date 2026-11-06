@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from "@angular/core";
 import { intervalToDuration, formatDuration } from "date-fns";
-import { enUS, uk, fr, sv, es, kk } from 'date-fns/locale';
+import { enUS, th } from 'date-fns/locale';
 
 @Pipe({
   name: "duration"
@@ -8,11 +8,7 @@ import { enUS, uk, fr, sv, es, kk } from 'date-fns/locale';
 export class DurationPipe implements PipeTransform {
   private localeMap = {
     en: enUS,
-    uk: uk,
-    fr: fr,
-    sv: sv,
-    es: es,
-    kk: kk,
+    th: th,
   };
 
   constructor() {}

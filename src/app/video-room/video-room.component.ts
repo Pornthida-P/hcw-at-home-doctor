@@ -57,7 +57,6 @@ export class VideoRoomComponent implements OnInit, OnDestroy {
   camStatus = 'on';
   screenStream: any = null;
 
-
   constructor(
     public dialog: MatDialog,
     private logger: LogService,
@@ -65,9 +64,8 @@ export class VideoRoomComponent implements OnInit, OnDestroy {
     private roomService: RoomService,
     private translate: TranslateService,
     private remotePeersService: RemotePeersService,
-    private snackBar: MatSnackBar,
-  ) {
-  }
+    private snackBar: MatSnackBar
+  ) {}
 
   @HostListener('window:beforeunload')
   beforeunloadHandler() {
@@ -100,15 +98,15 @@ export class VideoRoomComponent implements OnInit, OnDestroy {
   }
 
   checkControlStatus() {
-    clearTimeout(this.timer)
-    const canHover = !(matchMedia('(hover: none)').matches);
-    if(!canHover) {
+    clearTimeout(this.timer);
+    const canHover = !matchMedia('(hover: none)').matches;
+    if (!canHover) {
       const nextState = !this.showControls;
-      this.showControls = nextState
-      if(nextState){
-        this.timer = setTimeout(()=>{
-          this.checkControlStatus()
-        },5000)
+      this.showControls = nextState;
+      if (nextState) {
+        this.timer = setTimeout(() => {
+          this.checkControlStatus();
+        }, 5000);
       }
     }
   }
@@ -160,7 +158,7 @@ export class VideoRoomComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.push(
-      this.roomService.onCamError.subscribe((error) => {
+      this.roomService.onCamError.subscribe(error => {
         this.snackBar.open(
           this.translate.instant('videoRoom.cameraError'),
           'X',
@@ -169,7 +167,7 @@ export class VideoRoomComponent implements OnInit, OnDestroy {
       })
     );
     this.subscriptions.push(
-      this.roomService.onMicError.subscribe((error) => {
+      this.roomService.onMicError.subscribe(error => {
         this.snackBar.open(
           this.translate.instant('videoRoom.microphoneError'),
           'X',
@@ -240,8 +238,7 @@ export class VideoRoomComponent implements OnInit, OnDestroy {
       this.openviduLayoutOptions = {
         maxRatio: 3 / 2, // The narrowest ratio that will be used (default 2x3)
         minRatio: 9 / 16, // The widest ratio that will be used (default 16x9)
-        fixedRatio:
-            true /* If this is true then the aspect ratio of the video is maintained
+        fixedRatio: true /* If this is true then the aspect ratio of the video is maintained
     and minRatio and maxRatio are ignored (default false)*/,
         bigClass: 'OV_big', // The class to add to elements that should be sized bigger
         bigPercentage: 0.9, // The maximum percentage of space the big ones should take up
@@ -252,11 +249,10 @@ export class VideoRoomComponent implements OnInit, OnDestroy {
         animate: true, // Whether you want to animate the transitions
       };
       this.openviduLayout.initLayoutContainer(
-          layoutContainer,
-          this.openviduLayoutOptions
+        layoutContainer,
+        this.openviduLayoutOptions
       );
     }
-
   }
 
   exitSession(rejoin?) {
@@ -321,10 +317,10 @@ export class VideoRoomComponent implements OnInit, OnDestroy {
         title: this.translate.instant('chat.permissionRequired'),
       },
       autoFocus: false,
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.joinToSession();
       } else {
@@ -332,5 +328,4 @@ export class VideoRoomComponent implements OnInit, OnDestroy {
       }
     });
   }
-
 }
