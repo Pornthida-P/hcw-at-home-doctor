@@ -183,6 +183,55 @@ describe('ResetPasswordComponent', () => {
 
       expect(component.error).toBe('password-too-weak');
     });
+
+    it('should handle 429 rate-limit error', async () => {
+      authService.resetPassword.and.returnValue(
+        throwError({ status: 429, error: { message: 'Too Many Requests' } })
+      );
+      component.resetPasswordForm.patchValue({
+        password: 'Pass123',
+        confirmPassword: 'Pass123'
+      });
+
+      component.resetPassword();
+      await fixture.whenStable();
+
+      expect(component.error).toBe('rate-limit');
+    });
+
+    it('should handle network error when status is 0', async () => {
+      authService.resetPassword.and.returnValue(
+        throwError({ status: 0, error: null })
+      );
+      component.resetPasswordForm.patchValue({
+        password: 'Pass123',
+        confirmPassword: 'Pass123'
+      });
+
+      component.resetPassword();
+      await fixture.whenStable();
+
+      expect(component.error).toBe('network-error');
+    });
+
+    it('should prevent duplicate submission while loading', async () => {
+      authService.resetPassword.and.returnValue(
+        new Promise(resolve => setTimeout(() => resolve({ success: true }), 100))
+      );
+      component.resetPasswordForm.patchValue({
+        password: 'Pass123',
+        confirmPassword: 'Pass123'
+      });
+
+      component.resetPassword();
+      expect(component.loading).toBe(true);
+
+      const callCount1 = authService.resetPassword.calls.count();
+      component.resetPassword();
+      const callCount2 = authService.resetPassword.calls.count();
+
+      expect(callCount1).toBe(callCount2);
+    });
   });
 
   describe('Account Activation Flow', () => {
@@ -284,6 +333,31 @@ describe('ResetPasswordComponent', () => {
     it('should return null for malformed JWT', () => {
       const decoded = component.decodeJWT('part1.part2');
       expect(decoded).toBeNull();
+    });
+  });
+
+  describe('French Literal Removal', () => {
+    beforeEach(() => {
+      const mockToken = createMockJWT({ type: 'password-reset', email: 'test@example.com' });
+      spyOn(component, 'GetParam').and.returnValue(mockToken);
+      fixture.detectChanges();
+    });
+
+    it('should NOT have hardcoded French literal in confirm password field', () => {
+      const compiled = fixture.nativeElement;
+      const confirmPasswordInput = compiled.querySelector('input[formControlName="confirmPassword"]');
+      
+      expect(confirmPasswordInput).toBeTruthy();
+      
+      const placeholder = confirmPasswordInput.getAttribute('placeholder');
+      expect(placeholder).not.toContain('Confirmation du mot de passe');
+      expect(placeholder).not.toContain('mot de passe');
+    });
+
+    it('should use translation key for confirm password placeholder', () => {
+      const templateHtml = fixture.nativeElement.innerHTML;
+      expect(templateHtml).toContain('resetPassword.confirmPassword');
+      expect(templateHtml).not.toContain('Confirmation du mot de passe');
     });
   });
 });

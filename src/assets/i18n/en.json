@@ -633,6 +633,8 @@
     "yourTokenHasExpired": "Your token has expired. Please request a new one.",
     "invalidToken": "This password reset link is invalid or has already been used.",
     "passwordTooWeak": "Password does not meet security requirements. Please use at least 6 characters with a mix of letters and numbers.",
+    "rateLimit": "Too many attempts. Please wait a few minutes and try again.",
+    "networkError": "Unable to connect to the server. Please check your internet connection and try again.",
     "iForgotMyPassword": "I forgot my password.",
     "anUnknownErrorHasBeenEncountered": "An unknown error has been encountered. Please try again.",
     "home": "HOME"

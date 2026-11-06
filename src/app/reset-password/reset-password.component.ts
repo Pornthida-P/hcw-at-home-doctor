@@ -57,7 +57,7 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   resetPassword() {
-    if (this.resetPasswordForm.valid) {
+    if (this.resetPasswordForm.valid && !this.loading) {
       this.loading = true;
       this.error = '';
 
@@ -75,17 +75,25 @@ export class ResetPasswordComponent implements OnInit {
         this.error = '';
         this.success = true;
       }).catch(err => {
+        const statusCode = err?.status;
         const errorMessage = err?.error?.message || err?.message || err;
-        switch (errorMessage) {
-          case 'token-missing':
-          case 'token-expired':
-          case 'invalid-token':
-          case 'password-too-weak':
-            this.error = errorMessage;
-            break;
-          default:
-            this.error = "unknown";
-            break;
+        
+        if (statusCode === 429) {
+          this.error = 'rate-limit';
+        } else if (statusCode === 0 || !navigator.onLine) {
+          this.error = 'network-error';
+        } else {
+          switch (errorMessage) {
+            case 'token-missing':
+            case 'token-expired':
+            case 'invalid-token':
+            case 'password-too-weak':
+              this.error = errorMessage;
+              break;
+            default:
+              this.error = "unknown";
+              break;
+          }
         }
       }).finally(() => {
         this.loading = false;
