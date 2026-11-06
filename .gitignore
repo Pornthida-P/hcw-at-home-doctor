@@ -6,3 +6,8 @@ node_modules/
 
 package-lock.json
 yarn.lock
+
+# macOS metadata files
+._*
+.DS_Store
+__MACOSX/
