@@ -33,7 +33,14 @@ export class ResetPasswordComponent implements OnInit {
 
     try {
       const decodedToken = this.decodeJWT(this.token);
-      this.tokenType = decodedToken?.type || null;
+      const type = decodedToken?.type;
+      
+      if (type !== 'password-reset' && type !== 'account-activation') {
+        this.error = 'invalid-token';
+        return;
+      }
+      
+      this.tokenType = type;
       this.isActivation = this.tokenType === 'account-activation';
     } catch (e) {
       this.error = 'invalid-token';
@@ -57,6 +64,9 @@ export class ResetPasswordComponent implements OnInit {
       const token = this.resetPasswordForm.get("token").value;
       const password = this.resetPasswordForm.get("password").value;
 
+      // Route to appropriate endpoint based on JWT type decoded in ngOnInit.
+      // Backend verifies token type and authorization.
+      // DO NOT implement fallback logic (try reset then activation on error).
       const request = this.isActivation
         ? this.authService.activateAccount(token, password)
         : this.authService.resetPassword(token, password);
@@ -83,6 +93,11 @@ export class ResetPasswordComponent implements OnInit {
     }
   }
 
+  /**
+   * Decode JWT payload for CLIENT-SIDE ROUTING HINT ONLY.
+   * Backend is authoritative for token validation, signature, expiry, and purpose.
+   * This decode is NOT for authorization - only to determine UI flow and endpoint selection.
+   */
   decodeJWT(token: string): any {
     try {
       const parts = token.split('.');

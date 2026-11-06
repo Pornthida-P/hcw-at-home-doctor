@@ -93,6 +93,26 @@ describe('ResetPasswordComponent', () => {
 
       expect(component.error).toBe('invalid-token');
     });
+
+    it('should reject token with unknown type', () => {
+      const mockToken = createMockJWT({ type: 'unknown-type', email: 'test@example.com' });
+      spyOn(component, 'GetParam').and.returnValue(mockToken);
+
+      fixture.detectChanges();
+
+      expect(component.error).toBe('invalid-token');
+      expect(component.tokenType).toBeNull();
+    });
+
+    it('should reject token with missing type', () => {
+      const mockToken = createMockJWT({ email: 'test@example.com' });
+      spyOn(component, 'GetParam').and.returnValue(mockToken);
+
+      fixture.detectChanges();
+
+      expect(component.error).toBe('invalid-token');
+      expect(component.tokenType).toBeNull();
+    });
   });
 
   describe('Password Reset Flow', () => {
